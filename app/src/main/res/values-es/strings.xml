@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sign Wallet</string>
+    <string name="article_detail_more_info">Condiciones Generales</string>
+    <string name="navigation_quotes">Contratos</string>
+    <string name="navigation_settings">Configuración</string>
+    <string name="navigation_samples">Ejemplos</string>
+    <string name="navigation_sub_items">Mas opciones</string>
+    <string name="navigation_title">eCertic Sign Wallet</string>
+    <string name="pref_settings_1_description">Permitir avisos</string>
+    <string name="pref_settings_1_key">pref_settings_allow_notificacions</string>
+    <string name="pref_settings_1_title">Notificaciones</string>
+    <string name="pref_settings_2_title">Publicidad</string>
+    <string name="samples_hint_email">E-Mail</string>
+    <string name="samples_hint_username">Usuario</string>
+    <string name="samples_subhead"></string>
+    <string name="settings">Configuración</string>
+    <string name="pref_settings_2_key">pref_settings_allow_promos</string>
+    <string name="pref_settings_2_description">Recibir promociones</string>
+    <string name="pref_settings_3_title">Contraseña</string>
+    <string name="pref_settings_3_description">Proteger con contraseña</string>
+    <string name="pref_settings_3_key">pref_settings_password</string>
+    <string name="agreement">Acepto los términos y condiciones.</string>
+    <string name="clear_pad">Limpiar</string>
+    <string name="save_signature">Guardar Firma</string>
+    <string name="navigation_signature">Pad de Firma</string>
+</resources>

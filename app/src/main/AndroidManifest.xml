@@ -1,0 +1,33 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.ecertic.signWallet">
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:theme="@style/Theme.Main">
+
+        <activity android:name="com.ecertic.signWallet.ui.quote.ListActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <activity android:name="com.ecertic.signWallet.ui.quote.ArticleDetailActivity"
+            android:label=""
+            android:parentActivityName="com.ecertic.signWallet.ui.quote.ListActivity"/>
+        <activity android:name="com.ecertic.signWallet.ui.ViewSamplesActivity"
+            android:label="Samples"
+            android:parentActivityName="com.ecertic.signWallet.ui.quote.ListActivity"/>
+        <activity android:name="com.ecertic.signWallet.ui.SignatureActivity"
+            android:label="SignaturePad"
+            android:parentActivityName="com.ecertic.signWallet.ui.quote.ListActivity"/>
+        <activity android:name="com.ecertic.signWallet.ui.SettingsActivity"
+            android:label="Settings"
+            android:parentActivityName="com.ecertic.signWallet.ui.quote.ListActivity"/>
+
+    </application>
+
+</manifest>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="pref_settings_1_key">pref_settings_allow_notificacions</string>
+    <string name="pref_settings_1_title">Notifications</string>
+    <string name="pref_settings_1_description">Allow Notifications</string>
+
+    <string name="pref_settings_2_key">pref_settings_allow_promos</string>
+    <string name="pref_settings_2_title">Advertising</string>
+    <string name="pref_settings_2_description">Receive promotions</string>
+
+    <string name="pref_settings_3_key">pref_settings_password</string>
+    <string name="pref_settings_3_title">Password</string>
+    <string name="pref_settings_3_description">Password protection</string>
+</resources>
