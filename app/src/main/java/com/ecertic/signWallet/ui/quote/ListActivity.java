@@ -6,6 +6,7 @@ import android.support.v7.app.ActionBar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
+import android.util.Log;
 
 import com.ecertic.signWallet.R;
 import com.ecertic.signWallet.dummy.DummyContent;
@@ -27,6 +28,9 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
+        String url = getIntent().getDataString();
+
+        Log.d("URL", url);
 
         setupToolbar();
 

@@ -13,7 +13,7 @@
     <string name="pref_settings_2_title">Publicidad</string>
     <string name="samples_hint_email">E-Mail</string>
     <string name="samples_hint_username">Usuario</string>
-    <string name="samples_subhead"></string>
+    <string name="samples_subhead">Hola Subcabeza</string>
     <string name="settings">Configuración</string>
     <string name="pref_settings_2_key">pref_settings_allow_promos</string>
     <string name="pref_settings_2_description">Recibir promociones</string>
