@@ -24,5 +24,8 @@
     <string name="clear_pad">Clear Pad</string>
     <string name="save_signature">Save Signature</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="scanner">Scanner</string>
+    <string name="qrscanner">QRScanner</string>
+    <string name="title_activity_scanner_qr">ScannerQrActivity</string>
 
 </resources>

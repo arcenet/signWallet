@@ -9,7 +9,14 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.ecertic.signWallet.ui.base.ScannerQR"
-    tools:showIn="@layout/activity_scanner">
+    tools:context="com.ecertic.signWallet.ui.base.ScannerQrActivity"
+    tools:showIn="@layout/activity_scanner_qr">
+
+    <Button
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:text="Qr scanner"
+        android:onClick="QrScanner"
+        />
 
 </RelativeLayout>
