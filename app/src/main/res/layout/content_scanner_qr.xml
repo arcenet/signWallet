@@ -15,8 +15,8 @@
     <Button
         android:layout_height="wrap_content"
         android:layout_width="match_parent"
-        android:text="Qr scanner"
-        android:onClick="QrScanner"
-        />
+        android:text="Qr scanner"/>
+        <!--android:onClick="QrScanner"-->
+
 
 </RelativeLayout>

@@ -1,6 +1,7 @@
 package com.ecertic.signWallet.ui.quote;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,6 +20,15 @@ import com.ecertic.signWallet.util.LogUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
 /**
  * Lists all available quotes. This Activity supports a single pane (= smartphones) and a two pane mode (= large screens with >= 600dp width).
  *
@@ -29,8 +39,9 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
      * Whether or not the activity is running on a device with a large screen
      */
     private boolean twoPaneMode;
-    JSONObject json = new JSONObject();
+    public JSONObject jsonR = new JSONObject();
     private static String url;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,21 +61,25 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
             setupDetailFragment();
         }
 
-
-        /*Petición HTTP a la URL obtenida*/
-
+        /*Launch de aplicación a través de un código QR válido*/
 
         Bundle b = getIntent().getExtras();
         if (b != null) {
             url = b.getString("urlScan");
-            new retrieveJson().execute();
+            if (url != null) {
+                Log.d("URL:Scan", url);
+                //postURL = "https://api.rubricae.es/api/operation/" + url.substring(29);
+                new retrieveJson().execute();
+            }
 
         }
+
+        /*Launch de aplicación a través de un applink válido*/
 
         if (getIntent().getData() != null) {
             try {
                 url = getIntent().getDataString();
-                Log.d("URL", url);
+                Log.d("URL:AppLink", url);
                 new retrieveJson().execute();
 
             } catch (Exception e) {
@@ -147,9 +162,10 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
         return true;
     }
 
-    private class retrieveJson extends AsyncTask<String, String, JSONObject> {
+    private class retrieveJson extends AsyncTask<String, String, String> {
 
         private ProgressDialog pDialog;
+        HttpURLConnection urlConnection;
 
         @Override
         protected void onPreExecute() {
@@ -163,26 +179,92 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
         }
 
         @Override
-        protected JSONObject doInBackground(String... args) {
+        protected String doInBackground(String... args) {
             JSONParser jParser = new JSONParser();
+            StringBuilder result = new StringBuilder();
 
-            // Getting JSON from URL
+            /* Getting JSON from URL
             JSONObject json = null;
             try {
                 json = jParser.getJSONFromUrl(url);
             } catch (JSONException e) {
                 e.printStackTrace();
-            }
-            return json;
+            }*/
+            try {
+                URL postURL = new URL(url);
+                urlConnection = (HttpURLConnection) postURL.openConnection();
+                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 
+                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    result.append(line);
+                }
+
+            }catch( Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+                urlConnection.disconnect();
+            }
+
+
+            return result.toString();
         }
 
-        @Override
-        protected void onPostExecute(JSONObject json) {
-            pDialog.dismiss();
 
-            if (json != null) {
-                Log.d("JSON Content:", json.toString());
+
+
+        @Override
+        protected void onPostExecute(String json) {
+            pDialog.dismiss();
+            FileOutputStream outputStream;
+            try {
+                if (json != null) {
+                    jsonR = new JSONObject(json);
+                    Log.d("JSON Content:", json.toString());
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+            //Guardar archivo con contenido del JSON en un archivo con nombre igual al id de operacion
+            try {
+                File file = new File(getFilesDir(),jsonR.optString("oId").toString());
+
+
+
+                if (!file.exists()) {
+
+                    outputStream = openFileOutput(jsonR.optString("oId").toString(), Context.MODE_PRIVATE);
+
+                    outputStream.write(jsonR.toString().getBytes());
+                    outputStream.close();
+                    Log.d("Message:", "File created");
+                }
+                else{
+                    Log.d("Message:", "File alerady exists");
+                }
+
+
+
+                Log.d("Directory:", jsonR.optString("oId").toString() + "Filelist: " + getFilesDir());
+
+                //Imprime la lista de archivos guardados en ese momento
+                File dir = getFilesDir();
+                File[] subFiles = dir.listFiles();
+                if (subFiles != null)
+                {
+                    for (File filet : subFiles)
+                    {
+                        Log.d("Files: ",filet.getName());
+                    }
+                }
+
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
         }
 
