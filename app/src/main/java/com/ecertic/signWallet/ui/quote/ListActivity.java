@@ -17,6 +17,7 @@ import com.ecertic.signWallet.ui.base.BaseActivity;
 import com.ecertic.signWallet.util.JSONParser;
 import com.ecertic.signWallet.util.LogUtil;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,7 +40,7 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
      * Whether or not the activity is running on a device with a large screen
      */
     private boolean twoPaneMode;
-    public JSONObject jsonR = new JSONObject();
+    private JSONObject jsonR = new JSONObject();
     private static String url;
 
 
@@ -52,14 +53,19 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
         setupToolbar();
 
         if (isTwoPaneLayoutUsed()) {
+
             twoPaneMode = true;
             LogUtil.logD("TEST", "TWO POANE TASDFES");
             enableActiveItemState();
         }
 
         if (savedInstanceState == null && twoPaneMode) {
+
             setupDetailFragment();
         }
+
+        //Actualiza la lista de contratos
+        updateList();
 
         /*Launch de aplicación a través de un código QR válido*/
 
@@ -87,6 +93,8 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
             }
         }
 
+
+
     }
 
     /**
@@ -102,8 +110,12 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
             getFragmentManager().beginTransaction().replace(R.id.article_detail_container, fragment).commit();
         } else {
             // Start the detail activity in single pane mode.
+            Bundle b = new Bundle();
+            b.putString("id", id);
+
             Intent detailIntent = new Intent(this, ArticleDetailActivity.class);
             detailIntent.putExtra(ArticleDetailFragment.ARG_ITEM_ID, id);
+            detailIntent.putExtras(b);
             startActivity(detailIntent);
         }
     }
@@ -162,6 +174,30 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
         return true;
     }
 
+
+    //Actualiza la lista de contratos: un contrato por archivo JSON en el Internal Storage
+    public void updateList(){
+        int i= 5;
+        File dir = getFilesDir();
+        File[] subFiles = dir.listFiles();
+
+
+        if (subFiles != null)
+        {
+            for (File filet : subFiles)
+            {
+                Log.d("Files: ",filet.getName());
+                if (!filet.getName().equals("instant-run")) {
+                    DummyContent.addItem(new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", "Empresa X", filet.getName()));
+                    i++;
+                }
+            }
+        }
+
+    }
+
+
+
     private class retrieveJson extends AsyncTask<String, String, String> {
 
         private ProgressDialog pDialog;
@@ -212,8 +248,6 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
 
             return result.toString();
         }
-
-
 
 
         @Override

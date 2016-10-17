@@ -28,14 +28,15 @@ public class ArticleDetailActivity extends BaseActivity {
 
     private static final String TAG = makeLogTag(BaseActivity.class);
 
-    @Bind(R.id.main_content)
-    CoordinatorLayout layoutRoot;
+
+    /*@Bind(R.id.main_content)
+    CoordinatorLayout layoutRoot;*/
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail);
-        ButterKnife.bind(this);
+        //ButterKnife.bind(this);
 
         // Show the Up button in the action bar.
         if (getSupportActionBar() != null) {
@@ -46,7 +47,7 @@ public class ArticleDetailActivity extends BaseActivity {
         getFragmentManager().beginTransaction().replace(R.id.article_detail_container, fragment).commit();
     }
 
-    @OnClick(R.id.sign)
+   /* @OnClick(R.id.sign)
     public void submit(View view) {
         Snackbar.make(layoutRoot, "Hey, I'm SnackBar!", Snackbar.LENGTH_SHORT)
                 .setAction("Undo", new View.OnClickListener() {
@@ -56,7 +57,7 @@ public class ArticleDetailActivity extends BaseActivity {
                     }
                 })
                 .show();
-    }
+    }*/
 
     @Override
     public boolean providesActivityToolbar() {

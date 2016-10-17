@@ -1,8 +1,10 @@
 package com.ecertic.signWallet.ui.quote;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
@@ -19,9 +21,13 @@ import com.ecertic.signWallet.ui.base.BaseFragment;
 import com.bumptech.glide.Glide;
 
 import butterknife.Bind;
+import butterknife.OnClick;
+
 import com.ecertic.signWallet.R;
 import com.ecertic.signWallet.dummy.DummyContent;
 import com.ecertic.signWallet.ui.base.BaseActivity;
+
+import static android.content.Intent.getIntent;
 
 /**
  * Shows the quote detail page.
@@ -29,6 +35,7 @@ import com.ecertic.signWallet.ui.base.BaseActivity;
  * Created by Andreas Schrade on 14.12.2015.
  */
 public class ArticleDetailFragment extends BaseFragment {
+
 
     /**
      * The argument represents the dummy item ID of this fragment.
@@ -39,6 +46,9 @@ public class ArticleDetailFragment extends BaseFragment {
      * The dummy content of this fragment.
      */
     private DummyContent.DummyItem dummyItem;
+
+    @Bind(R.id.main_content)
+    CoordinatorLayout layoutRoot;
 
     @Bind(R.id.quote)
     TextView quote;
@@ -102,6 +112,22 @@ public class ArticleDetailFragment extends BaseFragment {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @OnClick(R.id.sign)
+    public void onSignClick(View view) {
+        Intent signIntent = new Intent(getActivity().getApplicationContext(), SignatureActivity.class);
+        Bundle b = new Bundle();
+
+        b.putString("oId", dummyItem.content);
+
+        signIntent.putExtras(b);
+        startActivity(signIntent);
+    }
+
+    public void signPad(View view) {
+
     }
 
     public static ArticleDetailFragment newInstance(String itemID) {
