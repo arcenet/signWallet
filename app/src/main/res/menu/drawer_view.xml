@@ -8,14 +8,9 @@
 
         <item
             android:id="@+id/nav_scan"
-            android:icon="@drawable/ic_forum"
+            android:icon="@mipmap/ic_menu_camera"
             android:title="@string/scanner" />
 
-
-        <item
-            android:id="@+id/nav_signature"
-            android:icon="@drawable/ic_dashboard"
-            android:title="@string/navigation_signature" />
 
         <item
             android:id="@+id/nav_settings"

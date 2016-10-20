@@ -111,10 +111,7 @@ public abstract class BaseActivity extends AppCompatActivity {
                 startActivity(new Intent(this, ListActivity.class));
                 finish();
                 break;
-            case R.id.nav_signature:
-                startActivity(new Intent(this, SignatureActivity.class));
-                finish();
-                break;
+
             case R.id.nav_scan:
                 startActivity(new Intent(this, ScannerQrActivity.class));
                 break;

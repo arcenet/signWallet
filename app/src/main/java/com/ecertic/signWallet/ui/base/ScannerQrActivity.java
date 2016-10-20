@@ -1,13 +1,17 @@
 package com.ecertic.signWallet.ui.base;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.GpsStatus;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -32,12 +36,23 @@ public class ScannerQrActivity extends BaseActivity implements ZXingScannerView.
     public ZXingScannerView mScannerView;
     private boolean twoPaneMode;
     public boolean finished = false;
+    private final int MY_PERMISSIONS_REQUEST_CAMERA = 0;
+    private boolean camera = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        QrScanner();
+        checkCamera();
+
+        int permissionCheck = ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA);
+
+
+        Log.d("Camera permission",String.valueOf(permissionCheck));
+
+
+        //QrScanner();
         /*setContentView(R.layout.activity_scanner_qr);
         setupToolbar();*/
 
@@ -46,6 +61,39 @@ public class ScannerQrActivity extends BaseActivity implements ZXingScannerView.
 
     private boolean isTwoPaneLayoutUsed() {
         return findViewById(R.id.article_detail_container) != null;
+    }
+
+    public void checkCamera(){
+        // Here, thisActivity is the current activity
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+            // Should we show an explanation?
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    Manifest.permission.READ_CONTACTS)) {
+
+                // Show an expanation to the user *asynchronously* -- don't block
+                // this thread waiting for the user's response! After the user
+                // sees the explanation, try again to request the permission.
+
+            } else {
+
+                // No explanation needed, we can request the permission.
+
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.CAMERA},
+                        MY_PERMISSIONS_REQUEST_CAMERA);
+
+                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+                // app-defined int constant. The callback method gets the
+                // result of the request.
+            }
+        }
+
+        else{
+            QrScanner();
+        }
     }
 
     public void QrScanner(){
@@ -68,6 +116,41 @@ public class ScannerQrActivity extends BaseActivity implements ZXingScannerView.
     public void resumeScan(){
 
         mScannerView.resumeCameraPreview(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode,
+                                           String permissions[], int[] grantResults) {
+        switch (requestCode) {
+            case MY_PERMISSIONS_REQUEST_CAMERA: {
+                // If request is cancelled, the result arrays are empty.
+                if (grantResults.length > 0
+                        && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+
+                    QrScanner();
+
+
+
+                } else {
+
+                    AlertDialog.Builder builder = new AlertDialog.Builder(ScannerQrActivity.this);
+                    builder.setMessage("Se necesitan los permisos de la camara para poder escanear")
+                            .setTitle("Error");
+                    builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            ScannerQrActivity.this.finish();
+                        }
+                    });
+                    AlertDialog dialog = builder.create();
+
+                    dialog.show();
+                }
+                return;
+            }
+
+            // other 'case' lines to check for other
+            // permissions this app might request
+        }
     }
 
     @Override
