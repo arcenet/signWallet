@@ -32,6 +32,7 @@ import android.view.MotionEvent;
 import android.view.View;
 
 import com.ecertic.signWallet.R;
+import com.ecertic.signWallet.dummy.DummyContent;
 import com.ecertic.signWallet.ui.base.BaseActivity;
 import com.ecertic.signWallet.util.JSONParser;
 import com.ecertic.signWallet.util.SignaturePad;
@@ -81,6 +82,8 @@ public class SignatureActivity extends BaseActivity {
     private double latitude = 0;
     private final int MY_PERMISSIONS_REQUEST_STORAGE = 0;
     boolean writePermission = false;
+    private String dummyId;
+    AlertDialog alert;
 
 
     @Override
@@ -94,7 +97,7 @@ public class SignatureActivity extends BaseActivity {
 
 
         Log.d("Write permission",String.valueOf(permissionCheck));
-
+        dummyId = getIntent().getExtras().getString("dummyID");
 
         checkStorage();
 
@@ -147,44 +150,78 @@ public class SignatureActivity extends BaseActivity {
             }
         });
 
+
         mSaveButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (writePermission) {
-                    Bitmap signatureBitmap = mSignaturePad.getSignatureBitmap();
-                    if (addJpgSignatureToGallery(signatureBitmap)) {
-                        Toast.makeText(SignatureActivity.this, "Signature saved into the Gallery", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(SignatureActivity.this, "Unable to store the signature", Toast.LENGTH_SHORT).show();
-                    }
-                    if (addPngSignatureToGallery(signatureBitmap)) {
-                        Toast.makeText(SignatureActivity.this, "Signature PNG saved into the Gallery", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(SignatureActivity.this, "Unable to store the signature", Toast.LENGTH_SHORT).show();
-                    }
-                    if (addSvgSignatureToGallery(mSignaturePad.getSignatureSvg())) {
-                        Toast.makeText(SignatureActivity.this, "SVG Signature saved into the Gallery", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(SignatureActivity.this, "Unable to store the SVG signature", Toast.LENGTH_SHORT).show();
-                    }
-                    buildJSON(json);
 
-
-                    AlertDialog.Builder builder = new AlertDialog.Builder(SignatureActivity.this);
-                    builder.setMessage("Firma guardada")
-                            .setTitle("Aviso");
-                    builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
-                        public void onClick(DialogInterface dialog, int id) {
-                            SignatureActivity.this.finish();
-                        }
-                    });
-                    AlertDialog dialog = builder.create();
-
-                    dialog.show();
+                if (!DummyContent.ITEMS.get(Integer.valueOf(dummyId)-1).isSigned) {
+                    saveSignature();
                 }
-                //Log.d("IP",ipAddress);
+                else{
+                    //Preguntar si desea sobrescribir la firma
+                     AlertDialog.Builder alertBuilder = new AlertDialog.Builder(SignatureActivity.this);
+
+                            alertBuilder.setTitle("Aviso");
+                            alertBuilder.setMessage("Ya existe una firma asociada a este contrato, ¿deseas sobrescribir el contenido?");
+                            alertBuilder.setIcon(android.R.drawable.ic_dialog_alert);
+                            alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                                public void onClick(DialogInterface dialog, int whichButton) {
+                                    saveSignature();
+                                }});
+                            alertBuilder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+
+                                public void onClick(DialogInterface dialog, int whichButton) {
+
+                                    alert.dismiss();
+                                }});
+
+
+                    alert = alertBuilder.create();
+                    alert.show();
+                }
             }
         });
+
+    }
+
+    public void saveSignature(){
+        if (writePermission) {
+            Bitmap signatureBitmap = mSignaturePad.getSignatureBitmap();
+            if (addJpgSignatureToGallery(signatureBitmap)) {
+                Toast.makeText(SignatureActivity.this, "Signature saved into the Gallery", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(SignatureActivity.this, "Unable to store the signature", Toast.LENGTH_SHORT).show();
+            }
+            if (addPngSignatureToGallery(signatureBitmap)) {
+                Toast.makeText(SignatureActivity.this, "Signature PNG saved into the Gallery", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(SignatureActivity.this, "Unable to store the signature", Toast.LENGTH_SHORT).show();
+            }
+
+            buildJSON(json);
+
+            //Cambiar estado de elemento a FIRMADO
+
+            DummyContent.ITEMS.get(Integer.valueOf(dummyId)-1).isSigned = true;
+
+
+            //Dialogo de firma Guardada
+            AlertDialog.Builder builder = new AlertDialog.Builder(SignatureActivity.this);
+            builder.setMessage("Firma guardada")
+                    .setTitle("Aviso");
+            builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
+                public void onClick(DialogInterface dialog, int id) {
+                    SignatureActivity.this.finish();
+                }
+            });
+            AlertDialog dialog = builder.create();
+
+            dialog.show();
+        }
+        //Log.d("IP",ipAddress);
+
 
     }
 

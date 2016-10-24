@@ -252,7 +252,7 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
 
         @Override
         protected void onPostExecute(String json) {
-            pDialog.dismiss();
+
             FileOutputStream outputStream;
             try {
                 if (json != null) {
@@ -297,9 +297,14 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
                 }
 
 
+
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
+
+            updateList();
+            pDialog.dismiss();
         }
 
     }

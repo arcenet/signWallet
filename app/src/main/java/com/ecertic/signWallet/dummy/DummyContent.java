@@ -38,12 +38,18 @@ public class DummyContent {
         ITEM_MAP.put(item.id, item);
     }
 
+    public void changeSignState(String id,boolean status){
+       ITEMS.get(Integer.valueOf(id)-1).isSigned = status;
+
+    }
+
     public static class DummyItem {
         public final String id;
         public final int photoId;
         public final String title;
         public final String author;
         public final String content;
+        public Boolean isSigned;
 
         public DummyItem(String id, int photoId, String title, String author, String content) {
             this.id = id;
@@ -51,6 +57,9 @@ public class DummyContent {
             this.title = title;
             this.author = author;
             this.content = content;
+            this.isSigned = false;
         }
+
+
     }
 }

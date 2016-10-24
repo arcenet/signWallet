@@ -121,6 +121,7 @@ public class ArticleDetailFragment extends BaseFragment {
         Bundle b = new Bundle();
 
         b.putString("oId", dummyItem.content);
+        b.putString("dummyID", dummyItem.id);
 
         signIntent.putExtras(b);
         startActivity(signIntent);
