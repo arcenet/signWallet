@@ -155,9 +155,22 @@ public class SignatureActivity extends BaseActivity {
             @Override
             public void onClick(View view) {
 
-                if (!DummyContent.ITEMS.get(Integer.valueOf(dummyId)-1).isSigned) {
+                //Variable jsonPoints para verificar si hay puntos de firma asociados en el JSON
+                int jsonPoints = 0;
+                try {
+
+                    jsonPoints = json.getJSONArray("signers").getJSONObject(0).getJSONObject("signature").getJSONArray("points").length();
+
+                    Log.e("Points",String.valueOf(jsonPoints));
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+                if (!DummyContent.ITEMS.get(Integer.valueOf(dummyId)-1).isSigned && jsonPoints == 0) {
                     saveSignature();
                 }
+
+
                 else{
                     //Preguntar si desea sobrescribir la firma
                      AlertDialog.Builder alertBuilder = new AlertDialog.Builder(SignatureActivity.this);
@@ -200,9 +213,10 @@ public class SignatureActivity extends BaseActivity {
                 Toast.makeText(SignatureActivity.this, "Unable to store the signature", Toast.LENGTH_SHORT).show();
             }
 
-            buildJSON(json);
+            buildJSON();
 
             //Cambiar estado de elemento a FIRMADO
+
 
             DummyContent.ITEMS.get(Integer.valueOf(dummyId)-1).isSigned = true;
 
@@ -438,21 +452,68 @@ public class SignatureActivity extends BaseActivity {
             while (fis.read(input) != -1) {
             }
             content += new String(input);
+            fis.close();
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
 
+
         try {
             json = new JSONObject(content);
+            if (json.has("file")) {
+                json.getJSONObject("file").put("content",0);
+            }
+            Log.e("JSONw",json.getJSONArray("signers").getJSONObject(0).getJSONObject("signature").toString());
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
     }
 
-    public void buildJSON(JSONObject json) {
+    public void saveJSON(){
+        //Guardar archivo con contenido del JSON en un archivo con nombre igual al id de operacion
+        FileOutputStream outputStream;
+        try {
+            File file = new File(getFilesDir(),json.optString("oId").toString());
+
+
+
+
+
+                outputStream = openFileOutput(json.optString("oId").toString(), Context.MODE_PRIVATE);
+
+                outputStream.write(json.toString().getBytes());
+                outputStream.close();
+                Log.d("Message:", "File saved");
+
+
+
+
+
+            Log.d("Directory:", json.optString("oId").toString() + "Filelist: " + getFilesDir());
+
+            //Imprime la lista de archivos guardados en ese momento
+            File dir = getFilesDir();
+            File[] subFiles = dir.listFiles();
+            if (subFiles != null)
+            {
+                for (File filet : subFiles)
+                {
+                    Log.d("Files: ",filet.getName());
+                }
+            }
+
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void buildJSON() {
 
         new getSystemInfo().execute();
 
@@ -467,11 +528,17 @@ public class SignatureActivity extends BaseActivity {
             signature.put("eventType", "Motion Event");
             signature.put("createdAt", System.currentTimeMillis());
 
+
             /*Tomar el arreglo que incluye los puntos de la firma*/
 
             Log.d("Content", signature.toString());
             JSONArray points = signature.getJSONArray("points");
 
+            JSONArray newPoints = new JSONArray();
+            if (points.length() > 0) {
+                signature.put("points", newPoints);
+
+            }
 
             /*Construir el JSONObject para cada punto*/
 
@@ -488,10 +555,16 @@ public class SignatureActivity extends BaseActivity {
                 point.put("radiusY", 0);
                 point.put("pressure", mSignaturePad.pressurePoints.get(i).floatValue());
 
-                points.put(point);
+                signature.getJSONArray("points").put(point);
+
 
             }
 
+            signer.put("signature",signature);
+
+            json.getJSONArray("signers").put(0,signer);
+
+            Log.e("JSONw",json.getJSONArray("signers").getJSONObject(0).getJSONObject("signature").toString());
             /*Construir JSONObject system con los datos del sistema*/
 
 
@@ -508,6 +581,9 @@ public class SignatureActivity extends BaseActivity {
 
 
             signer.put("system", system);
+
+
+            saveJSON();
 
         } catch (JSONException e) {
             e.printStackTrace();

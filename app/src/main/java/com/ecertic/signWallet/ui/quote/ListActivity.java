@@ -275,7 +275,7 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
 
                     outputStream.write(jsonR.toString().getBytes());
                     outputStream.close();
-                    Log.d("Message:", "File created");
+                    Log.d("Message:", "File saved");
                 }
                 else{
                     Log.d("Message:", "File alerady exists");

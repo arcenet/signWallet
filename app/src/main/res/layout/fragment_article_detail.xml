@@ -121,4 +121,16 @@
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"/>
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/send"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_anchor="@id/appbar"
+        app:layout_anchorGravity="bottom|left|end"
+        android:src="@drawable/ic_done"
+        android:layout_margin="@dimen/fab_margin"
+        android:clickable="true"/>
+
+    <!--android:backgroundTint="@color/cardview_dark_background"-->
+
 </android.support.design.widget.CoordinatorLayout>

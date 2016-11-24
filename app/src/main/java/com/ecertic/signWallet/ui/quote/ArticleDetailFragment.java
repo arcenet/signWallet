@@ -1,12 +1,16 @@
 package com.ecertic.signWallet.ui.quote;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -15,6 +19,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.ecertic.signWallet.ui.SignatureActivity;
 import com.ecertic.signWallet.ui.base.BaseFragment;
@@ -26,6 +31,25 @@ import butterknife.OnClick;
 import com.ecertic.signWallet.R;
 import com.ecertic.signWallet.dummy.DummyContent;
 import com.ecertic.signWallet.ui.base.BaseActivity;
+import com.ecertic.signWallet.util.JSONParser;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import static android.content.Intent.getIntent;
 
@@ -36,6 +60,8 @@ import static android.content.Intent.getIntent;
  */
 public class ArticleDetailFragment extends BaseFragment {
 
+    public JSONObject json;
+    public JSONObject jsonR;
 
     /**
      * The argument represents the dummy item ID of this fragment.
@@ -72,6 +98,14 @@ public class ArticleDetailFragment extends BaseFragment {
         }
 
         setHasOptionsMenu(true);
+
+        getJSON();
+
+        try {
+            Log.d("JSON:",json.getString("oId"));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
@@ -127,9 +161,33 @@ public class ArticleDetailFragment extends BaseFragment {
         startActivity(signIntent);
     }
 
+    @OnClick(R.id.send)
+    public void onSendClick(View view) {
+        new sendJson().execute();
+    }
+
     public void signPad(View view) {
 
     }
+
+    public void formatJSON() throws JSONException {
+        jsonR = new JSONObject();
+        jsonR.put("oId",json.get("oId"));
+        JSONArray signers = json.getJSONArray("signers");
+        jsonR.put("sId",signers.getJSONObject(0).get("sId"));
+        jsonR.put("profile",signers.getJSONObject(0).getJSONObject("profile"));
+        jsonR.put("signature",signers.getJSONObject(0).getJSONObject("signature"));
+        //signers.getJSONObject(0).getJSONObject("system").p("ip","127.0.0.1");
+        jsonR.put("system",signers.getJSONObject(0).getJSONObject("system"));
+        jsonR.getJSONObject("system").put("ip","127.0.0.1");
+
+        Log.d("SYSTEM JSON 1.11", "HOLA");
+
+        Log.d("SYSTEM JSON:", jsonR.getJSONObject("system").toString());
+        Log.d("FORMATTED JSON:", jsonR.toString());
+    }
+
+
 
     public static ArticleDetailFragment newInstance(String itemID) {
         ArticleDetailFragment fragment = new ArticleDetailFragment();
@@ -140,4 +198,140 @@ public class ArticleDetailFragment extends BaseFragment {
     }
 
     public ArticleDetailFragment() {}
+
+    public void getJSON() {
+        String id = dummyItem.content;
+        File file = new File(getActivity().getFilesDir(), id);
+
+        FileInputStream fis;
+        String content = "";
+        try {
+            fis = getActivity().openFileInput(file.getName());
+            byte[] input = new byte[fis.available()];
+            while (fis.read(input) != -1) {
+            }
+            content += new String(input);
+            fis.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            json = new JSONObject(content);
+            Log.d("JSON",json.toString());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+        try {
+            formatJSON();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private class sendJson extends AsyncTask<String, String, String> {
+
+        private ProgressDialog pDialog;
+
+        HttpURLConnection urlConnection;
+
+        @Override
+        protected void onPreExecute() {
+
+            super.onPreExecute();
+            pDialog = new ProgressDialog(getActivity());
+            pDialog.setMessage("Sending Data ...");
+            pDialog.setIndeterminate(false);
+            pDialog.setCancelable(true);
+            pDialog.show();
+        }
+
+        @Override
+        protected String doInBackground(String... args) {
+
+            StringBuilder result = new StringBuilder();
+
+            /* Getting JSON from URL
+            JSONObject json = null;
+            try {
+                json = jParser.getJSONFromUrl(url);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }*/
+            try {
+                URL postURL = new URL("https://testapi.rubricae.es/sendSign/sign");
+                urlConnection = (HttpURLConnection) postURL.openConnection();
+                urlConnection.setRequestMethod("POST");
+                urlConnection.setRequestProperty("Content-Type", "application/json; charset=utf-8");
+                OutputStream wr = urlConnection.getOutputStream();
+
+
+
+                wr.write(jsonR.toString().getBytes());
+
+                wr.flush();
+                wr.close();
+
+                //display what returns the POST request
+
+                final StringBuilder sb = new StringBuilder();
+                int HttpResult = urlConnection.getResponseCode();
+                if (HttpResult == HttpURLConnection.HTTP_OK) {
+                    BufferedReader br = new BufferedReader(
+                            new InputStreamReader(urlConnection.getInputStream(), "utf-8"));
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+                    getActivity().runOnUiThread(new Runnable() {
+                        public void run() {
+                            Toast.makeText(getActivity(), sb.toString(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
+
+                } else {
+                    getActivity().runOnUiThread(new Runnable() {
+                        public void run() {
+                            try {
+                                Toast.makeText(getActivity(),urlConnection.getResponseMessage(),Toast.LENGTH_SHORT).show();
+                            } catch (IOException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    });
+
+                }
+
+            }catch( Exception e) {
+                e.printStackTrace();
+            }
+            finally {
+
+                urlConnection.disconnect();
+            }
+
+
+            return result.toString();
+        }
+
+
+        @Override
+        protected void onPostExecute(String json) {
+
+            //Toast.makeText(getActivity(), "Firmado", Toast.LENGTH_SHORT).show();
+
+            //Actualizar estado de la operación
+            
+            pDialog.dismiss();
+        }
+
+    }
+
+
+
 }
