@@ -6,8 +6,11 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
+import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.view.ViewGroup;
 import android.widget.ListView;
 import android.util.Log;
 
@@ -24,18 +27,22 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+
+import static com.ecertic.signWallet.ui.quote.ArticleListFragment.*;
 
 /**
  * Lists all available quotes. This Activity supports a single pane (= smartphones) and a two pane mode (= large screens with >= 600dp width).
  *
  * Created by Andreas Schrade on 14.12.2015.
  */
-public class ListActivity extends BaseActivity implements ArticleListFragment.Callback {
+public class ListActivity extends BaseActivity implements Callback {
     /**
      * Whether or not the activity is running on a device with a large screen
      */
@@ -76,6 +83,7 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
                 Log.d("URL:Scan", url);
                 //postURL = "https://api.rubricae.es/api/operation/" + url.substring(29);
                 new retrieveJson().execute();
+                //updateList();
             }
 
         }
@@ -84,6 +92,7 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
 
         if (getIntent().getData() != null) {
             try {
+
                 url = getIntent().getDataString();
                 Log.d("URL:AppLink", url);
                 new retrieveJson().execute();
@@ -177,7 +186,8 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
 
     //Actualiza la lista de contratos: un contrato por archivo JSON en el Internal Storage
     public void updateList(){
-        int i= 5;
+        int i= DummyContent.ITEMS.size();
+        Boolean fileExists = false;
         File dir = getFilesDir();
         File[] subFiles = dir.listFiles();
 
@@ -187,12 +197,25 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
             for (File filet : subFiles)
             {
                 Log.d("Files: ",filet.getName());
-                if (!filet.getName().equals("instant-run")) {
+
+                for(int f = 0;f <= DummyContent.ITEMS.size()-1;f++){
+                    if (filet.getName() == DummyContent.ITEMS.get(f).content){
+                        fileExists = true;
+                    };
+                }
+
+                if (!filet.getName().equals("instant-run") && !filet.getName().contains(".pdf") && !fileExists) {
+
+
                     DummyContent.addItem(new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", "Empresa X", filet.getName()));
                     i++;
+
                 }
             }
         }
+        ArticleListFragment fragmentById = (ArticleListFragment) getFragmentManager().findFragmentById(R.id.article_list);
+        fragmentById.update();
+
 
     }
 
@@ -258,10 +281,25 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
                 if (json != null) {
                     jsonR = new JSONObject(json);
                     Log.d("JSON Content:", json.toString());
+
+
+
+                    String pdf64 = jsonR.getJSONObject("file").getString("content");
+
+                    File pdf = new File(getFilesDir(),jsonR.optString("oId").toString()+".pdf");
+
+                    FileOutputStream fos = new FileOutputStream(pdf);
+                    fos.write(Base64.decode(pdf64, Base64.NO_WRAP));
+                    fos.close();
                 }
             } catch (JSONException e) {
                 e.printStackTrace();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+
 
             //Guardar archivo con contenido del JSON en un archivo con nombre igual al id de operacion
             try {
@@ -303,8 +341,9 @@ public class ListActivity extends BaseActivity implements ArticleListFragment.Ca
                 e.printStackTrace();
             }
 
-            updateList();
             pDialog.dismiss();
+            updateList();
+
         }
 
     }

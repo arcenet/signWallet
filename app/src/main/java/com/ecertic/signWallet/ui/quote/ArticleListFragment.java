@@ -55,6 +55,12 @@ public class ArticleListFragment extends ListFragment {
         setHasOptionsMenu(true);
     }
 
+    public void update() {
+
+        setListAdapter(new MyListAdapter());
+
+    }
+
     @Override
     public void onListItemClick(ListView l, View v, int position, long id) {
         super.onListItemClick(l, v, position, id);
@@ -96,7 +102,7 @@ public class ArticleListFragment extends ListFragment {
         callback = (Callback) context;
     }
 
-    private class MyListAdapter extends BaseAdapter {
+    public class MyListAdapter extends BaseAdapter {
 
         @Override
         public int getCount() {

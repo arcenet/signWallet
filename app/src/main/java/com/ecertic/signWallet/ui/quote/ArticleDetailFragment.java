@@ -1,5 +1,6 @@
 package com.ecertic.signWallet.ui.quote;
 
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -32,6 +33,7 @@ import com.ecertic.signWallet.R;
 import com.ecertic.signWallet.dummy.DummyContent;
 import com.ecertic.signWallet.ui.base.BaseActivity;
 import com.ecertic.signWallet.util.JSONParser;
+import com.ecertic.signWallet.util.PDFActivity;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -158,7 +160,20 @@ public class ArticleDetailFragment extends BaseFragment {
         b.putString("dummyID", dummyItem.id);
 
         signIntent.putExtras(b);
-        startActivity(signIntent);
+        getActivity().startActivityForResult(signIntent,1);
+    }
+
+    @OnClick(R.id.pdf)
+    public void onPdfClick(View view) {
+        String id = dummyItem.content;
+        Intent pdfIntent = new Intent(getActivity().getApplicationContext(), PDFActivity.class);
+
+        File pdfFile = new File(getActivity().getFilesDir(), id + ".pdf");;
+
+        pdfIntent.putExtra("file",pdfFile);
+
+
+        getActivity().startActivity(pdfIntent);
     }
 
     @OnClick(R.id.send)
@@ -169,6 +184,20 @@ public class ArticleDetailFragment extends BaseFragment {
     public void signPad(View view) {
 
     }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
+        if (requestCode == 1) {
+            if(resultCode == Activity.RESULT_OK){
+                //String result=data.getStringExtra("result");
+                getJSON();
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                //Write your code if there's no result
+            }
+        }
+    }//onActivityResult
 
     public void formatJSON() throws JSONException {
         jsonR = new JSONObject();
@@ -198,6 +227,8 @@ public class ArticleDetailFragment extends BaseFragment {
     }
 
     public ArticleDetailFragment() {}
+
+
 
     public void getJSON() {
         String id = dummyItem.content;

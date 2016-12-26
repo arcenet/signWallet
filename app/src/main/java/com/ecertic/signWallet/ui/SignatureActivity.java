@@ -227,6 +227,10 @@ public class SignatureActivity extends BaseActivity {
                     .setTitle("Aviso");
             builder.setPositiveButton("Aceptar", new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int id) {
+                    Intent returnIntent = new Intent();
+                    returnIntent.putExtra("result",1);
+                    setResult(Activity.RESULT_OK,returnIntent);
+                    finish();
                     SignatureActivity.this.finish();
                 }
             });
@@ -462,9 +466,9 @@ public class SignatureActivity extends BaseActivity {
 
         try {
             json = new JSONObject(content);
-            if (json.has("file")) {
+            /*if (json.has("file")) {
                 json.getJSONObject("file").put("content",0);
-            }
+            }*/
             Log.e("JSONw",json.getJSONArray("signers").getJSONObject(0).getJSONObject("signature").toString());
         } catch (JSONException e) {
             e.printStackTrace();

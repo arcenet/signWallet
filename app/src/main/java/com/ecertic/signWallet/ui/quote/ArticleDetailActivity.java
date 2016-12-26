@@ -1,5 +1,6 @@
 package com.ecertic.signWallet.ui.quote;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
@@ -63,4 +64,6 @@ public class ArticleDetailActivity extends BaseActivity {
     public boolean providesActivityToolbar() {
         return false;
     }
+
+
 }
