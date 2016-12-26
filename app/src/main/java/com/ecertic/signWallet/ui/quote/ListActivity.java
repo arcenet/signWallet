@@ -211,6 +211,7 @@ public class ListActivity extends BaseActivity implements Callback {
                     i++;
 
                 }
+                fileExists = false;
             }
         }
         ArticleListFragment fragmentById = (ArticleListFragment) getFragmentManager().findFragmentById(R.id.article_list);

@@ -160,7 +160,7 @@ public class ArticleDetailFragment extends BaseFragment {
         b.putString("dummyID", dummyItem.id);
 
         signIntent.putExtras(b);
-        getActivity().startActivityForResult(signIntent,1);
+        startActivityForResult(signIntent,1);
     }
 
     @OnClick(R.id.pdf)
@@ -191,6 +191,7 @@ public class ArticleDetailFragment extends BaseFragment {
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
                 //String result=data.getStringExtra("result");
+                Log.d("Finish","Hola");
                 getJSON();
             }
             if (resultCode == Activity.RESULT_CANCELED) {

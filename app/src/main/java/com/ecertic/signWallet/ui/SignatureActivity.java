@@ -231,7 +231,7 @@ public class SignatureActivity extends BaseActivity {
                     returnIntent.putExtra("result",1);
                     setResult(Activity.RESULT_OK,returnIntent);
                     finish();
-                    SignatureActivity.this.finish();
+
                 }
             });
             AlertDialog dialog = builder.create();
