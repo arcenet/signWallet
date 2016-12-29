@@ -25,10 +25,10 @@ public class DummyContent {
     public static final Map<String, DummyItem> ITEM_MAP = new HashMap<>(5);
 
     static {
-        addItem(new DummyItem("1", R.drawable.p1, "Contrato Galp", "Tarjeta Fast", "Te regalamos tus primeros 600 puntos si solicitas hoy tu tarjeta Fast."));
-        addItem(new DummyItem("2", R.drawable.p2, "Contrato Bein", "beIN SPORTS CONNECT 9,99€","Disfrutalo estés donde estés."));
-        addItem(new DummyItem("3", R.drawable.p3, "Contrato Santander", "Cuenta 123", "1% 2% 3% Bonificaciones."));
-        addItem(new DummyItem("4", R.drawable.p4, "Contrato Salesland", "Contrata Hoy tu Seguro","¡Te puede salir Gratis el de Moto y Hogar!"));
+        //addItem(new DummyItem("1", R.drawable.p1, "Contrato Galp", "Tarjeta Fast", "Te regalamos tus primeros 600 puntos si solicitas hoy tu tarjeta Fast."));
+        //addItem(new DummyItem("2", R.drawable.p2, "Contrato Bein", "beIN SPORTS CONNECT 9,99€","Disfrutalo estés donde estés."));
+        //addItem(new DummyItem("3", R.drawable.p3, "Contrato Santander", "Cuenta 123", "1% 2% 3% Bonificaciones."));
+        //addItem(new DummyItem("4", R.drawable.p4, "Contrato Salesland", "Contrata Hoy tu Seguro","¡Te puede salir Gratis el de Moto y Hogar!"));
         //addItem(new DummyItem("5", R.drawable.p5, "Contrato Galp", "Steve Jobs","Deciding what not do do is as important as deciding what to do."));
         //DummyContent.ITEMS.add(new DummyContent.DummyItem("5",R.drawable.p5,"Contrato Tal","Empresa","Etc."));
     }

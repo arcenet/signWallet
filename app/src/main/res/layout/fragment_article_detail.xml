@@ -111,25 +111,45 @@
 
     </android.support.v4.widget.NestedScrollView>
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/sign"
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/signLayout"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|right|end"
-        android:src="@drawable/ic_pencil"
-        android:layout_margin="@dimen/fab_margin"
-        android:clickable="true"/>
+        android:layout_margin="@dimen/fab_margin">
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/send"
+        <android.support.design.widget.FloatingActionButton
+            android:id="@+id/sign"
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:src="@drawable/ic_pencil"
+            android:layout_margin="@dimen/fab_margin"
+            android:clickable="true"/>
+
+    </android.support.design.widget.CoordinatorLayout>
+
+    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:id="@+id/sendLayout"
         android:layout_height="wrap_content"
         android:layout_width="wrap_content"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|left|end"
-        android:src="@drawable/ic_done"
-        android:layout_margin="@dimen/fab_margin"
-        android:clickable="true"/>
+        android:layout_margin="@dimen/fab_margin">
+
+            <android.support.design.widget.FloatingActionButton
+                android:id="@+id/send"
+                android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:src="@drawable/ic_done"
+                android:layout_margin="@dimen/fab_margin"
+                android:clickable="true"
+                />
+
+    </android.support.design.widget.CoordinatorLayout>
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/pdf"
@@ -140,6 +160,7 @@
         android:src="@drawable/ic_discuss"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"/>
+
 
     <!--android:backgroundTint="@color/cardview_dark_background"-->
 

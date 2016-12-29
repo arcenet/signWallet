@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.design.widget.CoordinatorLayout;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
@@ -108,6 +109,8 @@ public class ArticleDetailFragment extends BaseFragment {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+
     }
 
     @Override
@@ -125,6 +128,18 @@ public class ArticleDetailFragment extends BaseFragment {
             author.setText(dummyItem.author);
             quote.setText(dummyItem.content);
         }
+
+        //Código para deshabilitar/desaparecer el botón de envio
+
+        /**FloatingActionButton sendButton =  (FloatingActionButton) rootView.findViewById(R.id.send);
+        CoordinatorLayout sendBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.sendLayout);
+        sendBtnCL.setVisibility(View.GONE);
+        sendButton.setEnabled(false);
+
+        sendButton.clearAnimation();
+        sendButton.setVisibility(View.GONE);**/
+
+
 
         return rootView;
     }
@@ -193,6 +208,8 @@ public class ArticleDetailFragment extends BaseFragment {
                 //String result=data.getStringExtra("result");
                 Log.d("Finish","Hola");
                 getJSON();
+                FloatingActionButton signButton =  (FloatingActionButton) getActivity().findViewById(R.id.sign);
+                signButton.setEnabled(false);
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result

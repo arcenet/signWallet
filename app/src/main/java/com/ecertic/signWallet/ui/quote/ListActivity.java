@@ -187,6 +187,7 @@ public class ListActivity extends BaseActivity implements Callback {
     //Actualiza la lista de contratos: un contrato por archivo JSON en el Internal Storage
     public void updateList(){
         int i= DummyContent.ITEMS.size();
+        Log.d("Dummy Size ",String.valueOf(i));
         Boolean fileExists = false;
         File dir = getFilesDir();
         File[] subFiles = dir.listFiles();
@@ -198,19 +199,25 @@ public class ListActivity extends BaseActivity implements Callback {
             {
                 Log.d("Files: ",filet.getName());
 
-                for(int f = 0;f <= DummyContent.ITEMS.size()-1;f++){
-                    if (filet.getName() == DummyContent.ITEMS.get(f).content){
-                        fileExists = true;
-                    };
+                if (!filet.getName().equals("instant-run") && !filet.getName().contains(".pdf")) {
+
+                    for (int f = 0; f <= DummyContent.ITEMS.size() - 1; f++) {
+                        Log.d("Names: ", filet.getName() + "-----" + DummyContent.ITEMS.get(f).content);
+                        if (filet.getName().equals(DummyContent.ITEMS.get(f).content)){
+                            fileExists = true;
+                            Log.d("Names: ", "File Exists");
+                        }
+                        ;
+                    }
+
+                    if (!fileExists) {
+
+                        DummyContent.addItem(new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", "Empresa X", filet.getName()));
+                        i++;
+
+                    }
                 }
 
-                if (!filet.getName().equals("instant-run") && !filet.getName().contains(".pdf") && !fileExists) {
-
-
-                    DummyContent.addItem(new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", "Empresa X", filet.getName()));
-                    i++;
-
-                }
                 fileExists = false;
             }
         }

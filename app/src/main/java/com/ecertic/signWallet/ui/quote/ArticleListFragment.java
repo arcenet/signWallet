@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.app.ListFragment;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.graphics.drawable.RoundedBitmapDrawable;
@@ -128,6 +129,7 @@ public class ArticleListFragment extends ListFragment {
             final DummyContent.DummyItem item = (DummyContent.DummyItem) getItem(position);
             ((TextView) convertView.findViewById(R.id.article_title)).setText(item.title);
             ((TextView) convertView.findViewById(R.id.article_subtitle)).setText(item.author);
+            //convertView.setBackgroundColor(Color.RED);
             final ImageView img = (ImageView) convertView.findViewById(R.id.thumbnail);
             Glide.with(getActivity()).load(item.photoId).asBitmap().fitCenter().into(new BitmapImageViewTarget(img) {
                 @Override
