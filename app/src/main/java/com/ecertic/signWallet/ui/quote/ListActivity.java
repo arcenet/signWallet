@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Message;
 import android.support.v7.app.ActionBar;
 import android.util.Base64;
 import android.view.Menu;
@@ -13,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.ecertic.signWallet.R;
 import com.ecertic.signWallet.dummy.DummyContent;
@@ -27,6 +29,7 @@ import org.json.JSONObject;
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -73,6 +76,7 @@ public class ListActivity extends BaseActivity implements Callback {
 
         //Actualiza la lista de contratos
         updateList();
+
 
         /*Launch de aplicación a través de un código QR válido*/
 
@@ -148,6 +152,10 @@ public class ListActivity extends BaseActivity implements Callback {
         fragmentById.getListView().setChoiceMode(ListView.CHOICE_MODE_SINGLE);
     }
 
+    public void errorMessage(){
+        Toast.makeText(this, "Error en la operación, operación caduca o inexistente", Toast.LENGTH_LONG).show();
+    }
+
     /**
      * Is the container present? If so, we are using the two-pane layout.
      *
@@ -199,11 +207,18 @@ public class ListActivity extends BaseActivity implements Callback {
             {
                 Log.d("Files: ",filet.getName());
 
+                //Vericar que para cada archivo JSON, exista un Dummy Item, si no crearlo.
+
                 if (!filet.getName().equals("instant-run") && !filet.getName().contains(".pdf")) {
 
                     for (int f = 0; f <= DummyContent.ITEMS.size() - 1; f++) {
-                        Log.d("Names: ", filet.getName() + "-----" + DummyContent.ITEMS.get(f).content);
+
                         if (filet.getName().equals(DummyContent.ITEMS.get(f).content)){
+
+                            //Cargar al dummy item, el status guardado su archivo ccorrespondiente (cargar datos al iniciar la aplicación)
+                            loadDummyStatus(filet,DummyContent.ITEMS.get(f));
+
+
                             fileExists = true;
                             Log.d("Names: ", "File Exists");
                         }
@@ -213,6 +228,7 @@ public class ListActivity extends BaseActivity implements Callback {
                     if (!fileExists) {
 
                         DummyContent.addItem(new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", "Empresa X", filet.getName()));
+                        loadDummyStatus(filet,DummyContent.ITEMS.get(i));
                         i++;
 
                     }
@@ -227,7 +243,36 @@ public class ListActivity extends BaseActivity implements Callback {
 
     }
 
+    public void loadDummyStatus(File file, DummyContent.DummyItem dummyItem){
 
+        FileInputStream fis;
+        String content = "";
+        try {
+            fis = openFileInput(file.getName());
+            byte[] input = new byte[fis.available()];
+            while (fis.read(input) != -1) {
+            }
+            content += new String(input);
+            fis.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        try {
+            JSONObject json = new JSONObject(content);
+            Log.d("JSON",json.toString());
+            if (json.has("status")) {
+                Log.d("JSONN Status",String.valueOf(json.getInt("status")));
+                dummyItem.status = json.getInt("status");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+    }
 
     private class retrieveJson extends AsyncTask<String, String, String> {
 
@@ -241,13 +286,13 @@ public class ListActivity extends BaseActivity implements Callback {
             pDialog = new ProgressDialog(ListActivity.this);
             pDialog.setMessage("Getting Data ...");
             pDialog.setIndeterminate(false);
-            pDialog.setCancelable(true);
+            pDialog.setCancelable(false);
             pDialog.show();
         }
 
         @Override
         protected String doInBackground(String... args) {
-            JSONParser jParser = new JSONParser();
+
             StringBuilder result = new StringBuilder();
 
             /* Getting JSON from URL
@@ -260,21 +305,26 @@ public class ListActivity extends BaseActivity implements Callback {
             try {
                 URL postURL = new URL(url);
                 urlConnection = (HttpURLConnection) postURL.openConnection();
-                InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+                try {
 
-                BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+                    InputStream in = new BufferedInputStream(urlConnection.getInputStream());
 
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    result.append(line);
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        result.append(line);
+                    }
+                }
+                    finally{
+                        urlConnection.disconnect();
+                    }
+
+                } catch (IOException e) {
+                    e.printStackTrace();
                 }
 
-            }catch( Exception e) {
-                e.printStackTrace();
-            }
-            finally {
-                urlConnection.disconnect();
-            }
+
 
 
             return result.toString();
@@ -284,72 +334,77 @@ public class ListActivity extends BaseActivity implements Callback {
         @Override
         protected void onPostExecute(String json) {
 
+            Boolean error = false;
             FileOutputStream outputStream;
             try {
-                if (json != null) {
-                    jsonR = new JSONObject(json);
-                    Log.d("JSON Content:", json.toString());
-
-
-
-                    String pdf64 = jsonR.getJSONObject("file").getString("content");
-
-                    File pdf = new File(getFilesDir(),jsonR.optString("oId").toString()+".pdf");
-
-                    FileOutputStream fos = new FileOutputStream(pdf);
-                    fos.write(Base64.decode(pdf64, Base64.NO_WRAP));
-                    fos.close();
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-
-
-            //Guardar archivo con contenido del JSON en un archivo con nombre igual al id de operacion
-            try {
-                File file = new File(getFilesDir(),jsonR.optString("oId").toString());
-
-
-
-                if (!file.exists()) {
-
-                    outputStream = openFileOutput(jsonR.optString("oId").toString(), Context.MODE_PRIVATE);
-
-                    outputStream.write(jsonR.toString().getBytes());
-                    outputStream.close();
-                    Log.d("Message:", "File saved");
+                if (json.isEmpty()) {
+                    error = true;
                 }
                 else{
-                    Log.d("Message:", "File alerady exists");
-                }
+                    if (json != null) {
+                        jsonR = new JSONObject(json);
+                        jsonR.put("status", DummyContent.DummyItem.LISTO);
+                        Log.d("JSON Content:", json.toString());
 
+                            String pdf64 = jsonR.getJSONObject("file").getString("content");
 
+                            File pdf = new File(getFilesDir(), jsonR.optString("oId").toString() + ".pdf");
 
-                Log.d("Directory:", jsonR.optString("oId").toString() + "Filelist: " + getFilesDir());
+                            FileOutputStream fos = new FileOutputStream(pdf);
+                            fos.write(Base64.decode(pdf64, Base64.NO_WRAP));
+                            fos.close();
 
-                //Imprime la lista de archivos guardados en ese momento
-                File dir = getFilesDir();
-                File[] subFiles = dir.listFiles();
-                if (subFiles != null)
-                {
-                    for (File filet : subFiles)
-                    {
-                        Log.d("Files: ",filet.getName());
                     }
                 }
-
-
-
-
-            } catch (Exception e) {
+            } catch (JSONException | IOException e) {
                 e.printStackTrace();
             }
 
-            pDialog.dismiss();
+            //Verifica si existe un error en el contenido
+            if (!error) {
+
+                //Guardar archivo con contenido del JSON en un archivo con nombre igual al id de operacion
+                try {
+                    File file = new File(getFilesDir(), jsonR.optString("oId").toString());
+
+
+                    if (!file.exists()) {
+
+                        outputStream = openFileOutput(jsonR.optString("oId").toString(), Context.MODE_PRIVATE);
+
+                        outputStream.write(jsonR.toString().getBytes());
+                        outputStream.close();
+                        Log.d("Message:", "File saved");
+                    } else {
+                        Log.d("Message:", "File alerady exists");
+                    }
+
+
+                    Log.d("Directory:", jsonR.optString("oId").toString() + "Filelist: " + getFilesDir());
+
+                    //Imprime la lista de archivos guardados en ese momento
+                    File dir = getFilesDir();
+                    File[] subFiles = dir.listFiles();
+                    if (subFiles != null) {
+                        for (File filet : subFiles) {
+                            Log.d("Files: ", filet.getName());
+                        }
+                    }
+
+
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+
+                pDialog.dismiss();
+            }
+            else{
+                errorMessage();
+                pDialog.dismiss();
+
+            }
+
+
             updateList();
 
         }

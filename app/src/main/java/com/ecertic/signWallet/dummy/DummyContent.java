@@ -30,6 +30,8 @@ public class DummyContent {
         //addItem(new DummyItem("3", R.drawable.p3, "Contrato Santander", "Cuenta 123", "1% 2% 3% Bonificaciones."));
         //addItem(new DummyItem("4", R.drawable.p4, "Contrato Salesland", "Contrata Hoy tu Seguro","¡Te puede salir Gratis el de Moto y Hogar!"));
         //addItem(new DummyItem("5", R.drawable.p5, "Contrato Galp", "Steve Jobs","Deciding what not do do is as important as deciding what to do."));
+        //addItem(new DummyItem("6", R.drawable.p5, "Contrato Galp", "Steve Jobs","Deciding what not do do is as important as deciding what to do."));
+
         //DummyContent.ITEMS.add(new DummyContent.DummyItem("5",R.drawable.p5,"Contrato Tal","Empresa","Etc."));
     }
 
@@ -44,12 +46,23 @@ public class DummyContent {
     }
 
     public static class DummyItem {
+
+        public static final int LISTO = 0;
+        public static final int FINALIZADO = 1;
+        public static final int PENDIENTE_DE_ENVIO = 2;
+        public static final int ADVERTENCIA = 3;
+        public static final int CADUCADO = 4;
+        public static final int ERROR = 5;
+
+
+
         public final String id;
         public final int photoId;
         public final String title;
         public final String author;
         public final String content;
         public Boolean isSigned;
+        public int status;
 
         public DummyItem(String id, int photoId, String title, String author, String content) {
             this.id = id;
@@ -58,6 +71,7 @@ public class DummyContent {
             this.author = author;
             this.content = content;
             this.isSigned = false;
+            //this.status = DummyItem.LISTO;
         }
 
 

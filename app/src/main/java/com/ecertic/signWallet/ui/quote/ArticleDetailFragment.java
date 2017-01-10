@@ -104,11 +104,11 @@ public class ArticleDetailFragment extends BaseFragment {
 
         getJSON();
 
-        try {
+        /*try {
             Log.d("JSON:",json.getString("oId"));
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
 
 
     }
@@ -129,7 +129,21 @@ public class ArticleDetailFragment extends BaseFragment {
             quote.setText(dummyItem.content);
         }
 
+        CoordinatorLayout signBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.signLayout);
+
+        CoordinatorLayout sendBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.sendLayout);
+        sendBtnCL.setVisibility(View.GONE);
+
         //Código para deshabilitar/desaparecer el botón de envio
+
+        if (dummyItem != null && dummyItem.status == DummyContent.DummyItem.PENDIENTE_DE_ENVIO) {
+
+            sendBtnCL.setVisibility(View.VISIBLE);
+        }
+
+        if (dummyItem.status == DummyContent.DummyItem.FINALIZADO){
+            signBtnCL.setVisibility(View.GONE);
+        }
 
         /**FloatingActionButton sendButton =  (FloatingActionButton) rootView.findViewById(R.id.send);
         CoordinatorLayout sendBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.sendLayout);
@@ -194,6 +208,9 @@ public class ArticleDetailFragment extends BaseFragment {
     @OnClick(R.id.send)
     public void onSendClick(View view) {
         new sendJson().execute();
+
+
+
     }
 
     public void signPad(View view) {
@@ -206,10 +223,15 @@ public class ArticleDetailFragment extends BaseFragment {
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
                 //String result=data.getStringExtra("result");
-                Log.d("Finish","Hola");
                 getJSON();
                 FloatingActionButton signButton =  (FloatingActionButton) getActivity().findViewById(R.id.sign);
                 signButton.setEnabled(false);
+                dummyItem.status = DummyContent.DummyItem.PENDIENTE_DE_ENVIO;
+                updateFileStatus();
+
+                CoordinatorLayout sendBtnCL = (CoordinatorLayout) getView().findViewById(R.id.sendLayout);
+                sendBtnCL.setVisibility(View.VISIBLE);
+
             }
             if (resultCode == Activity.RESULT_CANCELED) {
                 //Write your code if there's no result
@@ -228,12 +250,58 @@ public class ArticleDetailFragment extends BaseFragment {
         jsonR.put("system",signers.getJSONObject(0).getJSONObject("system"));
         jsonR.getJSONObject("system").put("ip","127.0.0.1");
 
-        Log.d("SYSTEM JSON 1.11", "HOLA");
-
         Log.d("SYSTEM JSON:", jsonR.getJSONObject("system").toString());
         Log.d("FORMATTED JSON:", jsonR.toString());
     }
 
+    public void updateFileStatus()  {
+        try {
+            json.put("status",dummyItem.status);
+
+
+            saveJSONFile();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    //Guardar Cambios en el archivo
+
+    public void saveJSONFile(){
+        try {
+            FileOutputStream outputStream;
+
+            File file = new File(getActivity().getFilesDir(), json.optString("oId"));
+
+
+
+
+                outputStream = getActivity().openFileOutput(json.optString("oId"), Context.MODE_PRIVATE);
+
+                outputStream.write(json.toString().getBytes());
+                outputStream.close();
+                Log.d("Message:", "File Overwritten");
+
+
+
+            Log.d("Directory:", json.optString("oId") + "Filelist: " + getActivity().getFilesDir());
+
+            //Imprime la lista de archivos guardados en ese momento
+            File dir = getActivity().getFilesDir();
+            File[] subFiles = dir.listFiles();
+            if (subFiles != null) {
+                for (File filet : subFiles) {
+                    Log.d("Files2: ", filet.getName());
+                }
+            }
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
 
     public static ArticleDetailFragment newInstance(String itemID) {
@@ -249,6 +317,9 @@ public class ArticleDetailFragment extends BaseFragment {
 
 
     public void getJSON() {
+        if (dummyItem == null){
+            return;
+        }
         String id = dummyItem.content;
         File file = new File(getActivity().getFilesDir(), id);
 
@@ -339,18 +410,35 @@ public class ArticleDetailFragment extends BaseFragment {
                     br.close();
                     getActivity().runOnUiThread(new Runnable() {
                         public void run() {
-                            Toast.makeText(getActivity(), sb.toString(), Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), sb.toString() + "Operación Firmada", Toast.LENGTH_SHORT).show();
+                            dummyItem.status = DummyContent.DummyItem.FINALIZADO;
+                            updateFileStatus();
+                            CoordinatorLayout sendBtnCL = (CoordinatorLayout) getView().findViewById(R.id.sendLayout);
+                            CoordinatorLayout signBtnCL = (CoordinatorLayout) getView().findViewById(R.id.signLayout);
+                            signBtnCL.setVisibility(View.GONE);
+                            sendBtnCL.setVisibility(View.GONE);
+
+
+
                         }
                     });
 
                 } else {
+                    BufferedReader br = new BufferedReader(
+                            new InputStreamReader(urlConnection.getErrorStream(), "utf-8"));
+                    String line = null;
+                    while ((line = br.readLine()) != null) {
+                        sb.append(line + "\n");
+                    }
+                    br.close();
+
                     getActivity().runOnUiThread(new Runnable() {
                         public void run() {
-                            try {
-                                Toast.makeText(getActivity(),urlConnection.getResponseMessage(),Toast.LENGTH_SHORT).show();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
+
+                            //Toast.makeText(getActivity(),urlConnection.getResponseMessage(),Toast.LENGTH_SHORT).show();
+                            Toast.makeText(getActivity(), "Error en la operación: " + sb.toString(), Toast.LENGTH_LONG).show();
+                            dummyItem.status = DummyContent.DummyItem.ERROR;
+                            updateFileStatus();
                         }
                     });
 

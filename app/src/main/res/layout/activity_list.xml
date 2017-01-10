@@ -5,13 +5,26 @@
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
-        <include layout="@layout/include_toolbar" />
-        <include layout="@layout/include_list_view" />
-    </LinearLayout>
+
+
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+            <include layout="@layout/include_toolbar" />
+
+            <include layout="@layout/include_list_view"/>
+
+            <include layout="@layout/include_footer"/>
+
+        </LinearLayout>
+
+
+
     <include layout="@layout/include_navigation" />
 
 </android.support.v4.widget.DrawerLayout>

@@ -166,7 +166,11 @@ public class SignatureActivity extends BaseActivity {
                     e.printStackTrace();
                 }
 
-                if (!DummyContent.ITEMS.get(Integer.valueOf(dummyId)-1).isSigned && jsonPoints == 0) {
+                /*if (!DummyContent.ITEMS.get(Integer.valueOf(dummyId)-1).isSigned && jsonPoints == 0) {
+                    saveSignature();
+                }*/
+
+                if (jsonPoints == 0) {
                     saveSignature();
                 }
 
@@ -218,7 +222,7 @@ public class SignatureActivity extends BaseActivity {
             //Cambiar estado de elemento a FIRMADO
 
 
-            DummyContent.ITEMS.get(Integer.valueOf(dummyId)-1).isSigned = true;
+            //DummyContent.ITEMS.get(Integer.valueOf(dummyId)-1).isSigned = true;
 
 
             //Dialogo de firma Guardada

@@ -129,6 +129,34 @@ public class ArticleListFragment extends ListFragment {
             final DummyContent.DummyItem item = (DummyContent.DummyItem) getItem(position);
             ((TextView) convertView.findViewById(R.id.article_title)).setText(item.title);
             ((TextView) convertView.findViewById(R.id.article_subtitle)).setText(item.author);
+
+            //Cambia el color dependiendo del estado de la operación
+            switch(item.status){
+
+            case DummyContent.DummyItem.ADVERTENCIA:
+                convertView.setBackgroundColor(Color.YELLOW);
+                break;
+
+            case DummyContent.DummyItem.ERROR:
+                convertView.setBackgroundColor(Color.RED);
+                break;
+
+            case DummyContent.DummyItem.FINALIZADO:
+                convertView.setBackgroundColor(Color.GREEN);
+                break;
+
+            case DummyContent.DummyItem.CADUCADO:
+                convertView.setBackgroundColor(Color.RED);
+                break;
+
+            case DummyContent.DummyItem.PENDIENTE_DE_ENVIO:
+                convertView.setBackgroundColor(Color.YELLOW);
+            }
+
+
+
+
+
             //convertView.setBackgroundColor(Color.RED);
             final ImageView img = (ImageView) convertView.findViewById(R.id.thumbnail);
             Glide.with(getActivity()).load(item.photoId).asBitmap().fitCenter().into(new BitmapImageViewTarget(img) {

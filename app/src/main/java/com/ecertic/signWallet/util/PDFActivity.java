@@ -40,7 +40,7 @@ public class PDFActivity extends AppCompatActivity {
         PDFView pdfView = (PDFView) findViewById(R.id.pdfview);
 
         pdfView.fromFile(pdf)
-                .pages(0, 1, 2, 3)
+
                 .defaultPage(1)
                 .showMinimap(false)
                 .enableSwipe(true)

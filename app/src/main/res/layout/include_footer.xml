@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/footer"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:layout_gravity="bottom"
+    android:background="#ffffff"
+    >
+
+   <LinearLayout
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+       android:orientation="horizontal"
+       android:weightSum="15">
+
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:background="@drawable/square"
+          android:layout_gravity="center_vertical|left"
+          android:layout_marginEnd="5dp"
+          android:layout_marginStart="3dp"
+          android:layout_weight="1"/>
+
+       <TextView
+        android:id="@+id/texthere2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Finalizada"
+        android:textSize="16sp"
+        android:layout_centerVertical="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="8dp" android:layout_gravity="center_vertical|left"
+           android:layout_weight="4"/>
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:background="@drawable/square_yellow"
+          android:layout_gravity="center_vertical|center"
+          android:layout_marginEnd="5dp"
+          android:layout_weight="1"/>
+
+      <TextView
+          android:id="@+id/texthere3"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Advertencia"
+          android:textSize="16sp"
+          android:layout_marginEnd="8dp" android:layout_gravity="center_vertical|center"
+          android:layout_weight="4"/>
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:background="@drawable/square_red"
+          android:layout_gravity="center_vertical|end"
+          android:layout_marginEnd="5dp"
+          android:layout_weight="1"/>
+
+      <TextView
+          android:id="@+id/texthere4"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Error"
+          android:textSize="16sp"
+          android:layout_marginEnd="8dp" android:layout_gravity="center_vertical|end"
+          android:layout_weight="4"/>
+
+   </LinearLayout>
+
+</LinearLayout>
