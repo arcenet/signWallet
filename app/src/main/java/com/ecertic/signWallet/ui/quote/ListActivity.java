@@ -2,11 +2,13 @@ package com.ecertic.signWallet.ui.quote;
 
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.util.Base64;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -52,6 +54,8 @@ public class ListActivity extends BaseActivity implements Callback {
     private boolean twoPaneMode;
     private JSONObject jsonR = new JSONObject();
     private static String url;
+    private String lastId;
+    AlertDialog  alert;
 
 
     @Override
@@ -125,6 +129,7 @@ public class ListActivity extends BaseActivity implements Callback {
             // Start the detail activity in single pane mode.
             Bundle b = new Bundle();
             b.putString("id", id);
+            Log.d("IDIDIDID",id );
 
             Intent detailIntent = new Intent(this, ArticleDetailActivity.class);
             detailIntent.putExtra(ArticleDetailFragment.ARG_ITEM_ID, id);
@@ -237,6 +242,7 @@ public class ListActivity extends BaseActivity implements Callback {
                 fileExists = false;
             }
         }
+        lastId = String.valueOf(i-1);
         ArticleListFragment fragmentById = (ArticleListFragment) getFragmentManager().findFragmentById(R.id.article_list);
         fragmentById.update();
 
@@ -341,20 +347,20 @@ public class ListActivity extends BaseActivity implements Callback {
                     error = true;
                 }
                 else{
-                    if (json != null) {
-                        jsonR = new JSONObject(json);
-                        jsonR.put("status", DummyContent.DummyItem.LISTO);
-                        Log.d("JSON Content:", json.toString());
 
-                            String pdf64 = jsonR.getJSONObject("file").getString("content");
+                    jsonR = new JSONObject(json);
+                    jsonR.put("status", DummyContent.DummyItem.LISTO);
+                    Log.d("JSON Content:", json);
 
-                            File pdf = new File(getFilesDir(), jsonR.optString("oId").toString() + ".pdf");
+                        String pdf64 = jsonR.getJSONObject("file").getString("content");
 
-                            FileOutputStream fos = new FileOutputStream(pdf);
-                            fos.write(Base64.decode(pdf64, Base64.NO_WRAP));
-                            fos.close();
+                        File pdf = new File(getFilesDir(), jsonR.optString("oId") + ".pdf");
 
-                    }
+                        FileOutputStream fos = new FileOutputStream(pdf);
+                        fos.write(Base64.decode(pdf64, Base64.NO_WRAP));
+                        fos.close();
+
+
                 }
             } catch (JSONException | IOException e) {
                 e.printStackTrace();
@@ -365,12 +371,12 @@ public class ListActivity extends BaseActivity implements Callback {
 
                 //Guardar archivo con contenido del JSON en un archivo con nombre igual al id de operacion
                 try {
-                    File file = new File(getFilesDir(), jsonR.optString("oId").toString());
+                    File file = new File(getFilesDir(), jsonR.optString("oId"));
 
 
                     if (!file.exists()) {
 
-                        outputStream = openFileOutput(jsonR.optString("oId").toString(), Context.MODE_PRIVATE);
+                        outputStream = openFileOutput(jsonR.optString("oId"), Context.MODE_PRIVATE);
 
                         outputStream.write(jsonR.toString().getBytes());
                         outputStream.close();
@@ -380,7 +386,7 @@ public class ListActivity extends BaseActivity implements Callback {
                     }
 
 
-                    Log.d("Directory:", jsonR.optString("oId").toString() + "Filelist: " + getFilesDir());
+                    Log.d("Directory:", jsonR.optString("oId") + "Filelist: " + getFilesDir());
 
                     //Imprime la lista de archivos guardados en ese momento
                     File dir = getFilesDir();
@@ -406,6 +412,35 @@ public class ListActivity extends BaseActivity implements Callback {
 
 
             updateList();
+            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ListActivity.this);
+
+            alertBuilder.setTitle("Aviso");
+            alertBuilder.setMessage("Se ha agregado una nueva operación al wallet, ¿deseas proceder con la firma del documento o verlo mas tarde?");
+            alertBuilder.setIcon(android.R.drawable.ic_dialog_alert);
+            alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    Bundle b = new Bundle();
+                    b.putString("id", lastId);
+
+                    Log.d("IDIDIDID",lastId );
+                    Intent detailIntent = new Intent(ListActivity.this, ArticleDetailActivity.class);
+                    detailIntent.putExtra(ArticleDetailFragment.ARG_ITEM_ID, lastId);
+                    detailIntent.putExtras(b);
+                    startActivity(detailIntent);
+
+                }});
+            alertBuilder.setNegativeButton("Verlo mas tarde", new DialogInterface.OnClickListener() {
+
+                public void onClick(DialogInterface dialog, int whichButton) {
+
+                    alert.dismiss();
+                }});
+
+
+            alert = alertBuilder.create();
+            alert.show();
 
         }
 

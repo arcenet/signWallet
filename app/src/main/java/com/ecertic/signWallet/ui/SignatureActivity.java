@@ -161,7 +161,8 @@ public class SignatureActivity extends BaseActivity {
 
                     jsonPoints = json.getJSONArray("signers").getJSONObject(0).getJSONObject("signature").getJSONArray("points").length();
 
-                    Log.e("Points",String.valueOf(jsonPoints));
+                    Log.e("Points2",String.valueOf(jsonPoints));
+
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -306,7 +307,7 @@ public class SignatureActivity extends BaseActivity {
 
                     dialog.show();
                 }
-                return;
+
             }
 
             // other 'case' lines to check for other
@@ -397,12 +398,12 @@ public class SignatureActivity extends BaseActivity {
         String base64 = Base64.encodeToString(b,Base64.DEFAULT);
         Log.d("Length",String.valueOf(base64.length()));
         int maxLogSize = 1000;
-        for(int i = 0; i <= base64.length() / maxLogSize; i++) {
+        /*for(int i = 0; i <= base64.length() / maxLogSize; i++) {
             int start = i * maxLogSize;
             int end = (i+1) * maxLogSize;
             end = end > base64.length() ? base64.length() : end;
             Log.v("TAG", base64.substring(start, end));
-        }
+        }*/
         try {
             json.getJSONArray("signers").getJSONObject(0).getJSONObject("signature").put("content",base64);
         } catch (JSONException e) {
@@ -448,6 +449,8 @@ public class SignatureActivity extends BaseActivity {
         return result;
     }
 
+
+    //Obtener archivo JSON desde archivo con nombre igual al id pasado en la actividad anterior
     public void getJSON() {
         String id = getIntent().getExtras().getString("oId");
         File file = new File(getFilesDir(), id);
@@ -461,8 +464,6 @@ public class SignatureActivity extends BaseActivity {
             }
             content += new String(input);
             fis.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -484,13 +485,13 @@ public class SignatureActivity extends BaseActivity {
         //Guardar archivo con contenido del JSON en un archivo con nombre igual al id de operacion
         FileOutputStream outputStream;
         try {
-            File file = new File(getFilesDir(),json.optString("oId").toString());
+            File file = new File(getFilesDir(),json.optString("oId"));
 
 
 
 
 
-                outputStream = openFileOutput(json.optString("oId").toString(), Context.MODE_PRIVATE);
+                outputStream = openFileOutput(json.optString("oId"), Context.MODE_PRIVATE);
 
                 outputStream.write(json.toString().getBytes());
                 outputStream.close();
@@ -500,7 +501,7 @@ public class SignatureActivity extends BaseActivity {
 
 
 
-            Log.d("Directory:", json.optString("oId").toString() + "Filelist: " + getFilesDir());
+            Log.d("Directory:", json.optString("oId") + "Filelist: " + getFilesDir());
 
             //Imprime la lista de archivos guardados en ese momento
             File dir = getFilesDir();

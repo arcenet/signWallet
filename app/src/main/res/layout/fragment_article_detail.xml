@@ -21,7 +21,25 @@
             android:fitsSystemWindows="true"
             style="@style/SizeSpecificCollapsingToolbarLayout"
             app:expandedTitleMarginStart="48dp"
-            app:expandedTitleMarginEnd="64dp">
+            app:expandedTitleMarginEnd="64dp"
+            app:expandedTitleGravity="top"
+            >
+
+            <!--<TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Firmar"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:textAlignment="center"
+                android:textStyle="bold"
+                android:layout_gravity="center|bottom"
+                android:layout_marginBottom="30dp"
+
+                android:background="@drawable/rounded_corner"
+
+                />-->
+
 
             <ImageView
                 android:id="@+id/backdrop"
@@ -112,7 +130,7 @@
     </android.support.v4.widget.NestedScrollView>
 
 
-    <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <!--<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/signLayout"
         android:layout_height="wrap_content"
@@ -129,7 +147,7 @@
             android:layout_margin="@dimen/fab_margin"
             android:clickable="true"/>
 
-    </android.support.design.widget.CoordinatorLayout>
+    </android.support.design.widget.CoordinatorLayout>-->
 
     <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -149,7 +167,11 @@
                 android:clickable="true"
                 />
 
+
+
     </android.support.design.widget.CoordinatorLayout>
+
+
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/pdf"
@@ -157,9 +179,12 @@
         android:layout_width="wrap_content"
         app:layout_anchor="@id/appbar"
         app:layout_anchorGravity="bottom|center"
-        android:src="@drawable/ic_discuss"
+        android:src="@drawable/ic_pencil"
         android:layout_margin="@dimen/fab_margin"
         android:clickable="true"/>
+
+
+
 
 
     <!--android:backgroundTint="@color/cardview_dark_background"-->

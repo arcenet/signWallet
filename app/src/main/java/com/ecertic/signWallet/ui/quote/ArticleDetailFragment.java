@@ -129,7 +129,7 @@ public class ArticleDetailFragment extends BaseFragment {
             quote.setText(dummyItem.content);
         }
 
-        CoordinatorLayout signBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.signLayout);
+        //CoordinatorLayout signBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.signLayout);
 
         CoordinatorLayout sendBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.sendLayout);
         sendBtnCL.setVisibility(View.GONE);
@@ -141,9 +141,9 @@ public class ArticleDetailFragment extends BaseFragment {
             sendBtnCL.setVisibility(View.VISIBLE);
         }
 
-        if (dummyItem.status == DummyContent.DummyItem.FINALIZADO){
+        /*if (dummyItem.status == DummyContent.DummyItem.FINALIZADO){
             signBtnCL.setVisibility(View.GONE);
-        }
+        }*/
 
         /**FloatingActionButton sendButton =  (FloatingActionButton) rootView.findViewById(R.id.send);
         CoordinatorLayout sendBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.sendLayout);
@@ -180,7 +180,7 @@ public class ArticleDetailFragment extends BaseFragment {
     }
 
 
-    @OnClick(R.id.sign)
+    /*@OnClick(R.id.sign)
     public void onSignClick(View view) {
         Intent signIntent = new Intent(getActivity().getApplicationContext(), SignatureActivity.class);
         Bundle b = new Bundle();
@@ -190,19 +190,21 @@ public class ArticleDetailFragment extends BaseFragment {
 
         signIntent.putExtras(b);
         startActivityForResult(signIntent,1);
-    }
+    }*/
 
     @OnClick(R.id.pdf)
     public void onPdfClick(View view) {
         String id = dummyItem.content;
-        Intent pdfIntent = new Intent(getActivity().getApplicationContext(), PDFActivity.class);
+        Intent pdfIntent = new Intent(getActivity(), PDFActivity.class);
 
         File pdfFile = new File(getActivity().getFilesDir(), id + ".pdf");;
 
         pdfIntent.putExtra("file",pdfFile);
+        pdfIntent.putExtra("oId", dummyItem.content);
+        pdfIntent.putExtra("dummyID", dummyItem.id);
 
+        startActivityForResult(pdfIntent,1);
 
-        getActivity().startActivity(pdfIntent);
     }
 
     @OnClick(R.id.send)
@@ -220,20 +222,27 @@ public class ArticleDetailFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
 
+        Log.e("Request Code", String.valueOf(requestCode));
+
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
+                Toast.makeText(getActivity(),"Finished",Toast.LENGTH_LONG);
                 //String result=data.getStringExtra("result");
                 getJSON();
-                FloatingActionButton signButton =  (FloatingActionButton) getActivity().findViewById(R.id.sign);
-                signButton.setEnabled(false);
+                //FloatingActionButton signButton =  (FloatingActionButton) getActivity().findViewById(R.id.sign);
+                //signButton.setEnabled(false);
                 dummyItem.status = DummyContent.DummyItem.PENDIENTE_DE_ENVIO;
                 updateFileStatus();
 
-                CoordinatorLayout sendBtnCL = (CoordinatorLayout) getView().findViewById(R.id.sendLayout);
-                sendBtnCL.setVisibility(View.VISIBLE);
+                //CoordinatorLayout sendBtnCL = (CoordinatorLayout) getView().findViewById(R.id.sendLayout);
+                //sendBtnCL.setVisibility(View.VISIBLE);
+
+                //Enviar firma a rubricae
+                new sendJson().execute();
 
             }
             if (resultCode == Activity.RESULT_CANCELED) {
+                Toast.makeText(getActivity(),"Canceled",Toast.LENGTH_LONG);
                 //Write your code if there's no result
             }
         }
@@ -332,8 +341,6 @@ public class ArticleDetailFragment extends BaseFragment {
             }
             content += new String(input);
             fis.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -414,8 +421,8 @@ public class ArticleDetailFragment extends BaseFragment {
                             dummyItem.status = DummyContent.DummyItem.FINALIZADO;
                             updateFileStatus();
                             CoordinatorLayout sendBtnCL = (CoordinatorLayout) getView().findViewById(R.id.sendLayout);
-                            CoordinatorLayout signBtnCL = (CoordinatorLayout) getView().findViewById(R.id.signLayout);
-                            signBtnCL.setVisibility(View.GONE);
+                            //CoordinatorLayout signBtnCL = (CoordinatorLayout) getView().findViewById(R.id.signLayout);
+                            //signBtnCL.setVisibility(View.GONE);
                             sendBtnCL.setVisibility(View.GONE);
 
 
