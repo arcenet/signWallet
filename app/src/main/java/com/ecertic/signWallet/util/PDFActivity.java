@@ -8,12 +8,17 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
+import android.widget.Toast;
 
 import com.ecertic.signWallet.R;
 import com.ecertic.signWallet.ui.SignatureActivity;
 import com.joanzapata.pdfview.PDFView;
 
 import java.io.File;
+
+import butterknife.internal.ListenerClass;
+
+import static android.view.View.GONE;
 
 
 public class PDFActivity extends AppCompatActivity {
@@ -25,11 +30,14 @@ public class PDFActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Documento PDF a firmar");
         setSupportActionBar(toolbar);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 
         File pdf = (File) getIntent().getExtras().get("file");
 
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+
+
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -59,6 +67,12 @@ public class PDFActivity extends AppCompatActivity {
                 .showMinimap(false)
                 .enableSwipe(true)
                 .load();
+
+
+        if (getIntent().getExtras().containsKey("firmado")){
+            fab.setVisibility(GONE);
+            Toast.makeText(this,"Este documento ya ha sido firmado",Toast.LENGTH_LONG).show();
+        }
     }
 
 }

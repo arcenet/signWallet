@@ -203,6 +203,12 @@ public class ArticleDetailFragment extends BaseFragment {
         pdfIntent.putExtra("oId", dummyItem.content);
         pdfIntent.putExtra("dummyID", dummyItem.id);
 
+        //Pasar true a actividad PDF si el status de la operación es: FIRMADO
+
+        if (dummyItem.status == DummyContent.DummyItem.FINALIZADO){
+            pdfIntent.putExtra("firmado", true);
+        }
+
         startActivityForResult(pdfIntent,1);
 
     }

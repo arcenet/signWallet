@@ -57,6 +57,12 @@ public class ListActivity extends BaseActivity implements Callback {
     private String lastId;
     AlertDialog  alert;
 
+    @Override
+    protected void onRestart(){
+        super.onRestart();
+        updateList();
+
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
