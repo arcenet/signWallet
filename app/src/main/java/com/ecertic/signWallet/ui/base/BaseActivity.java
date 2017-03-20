@@ -133,6 +133,7 @@ public abstract class BaseActivity extends AppCompatActivity {
             }
         }
         return getSupportActionBar();
+
     }
 
 

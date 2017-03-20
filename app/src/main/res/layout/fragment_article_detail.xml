@@ -158,20 +158,24 @@
         app:layout_anchorGravity="bottom|left|end"
         android:layout_margin="@dimen/fab_margin">
 
-            <android.support.design.widget.FloatingActionButton
-                android:id="@+id/send"
-                android:layout_height="wrap_content"
-                android:layout_width="wrap_content"
-                android:src="@drawable/ic_done"
-                android:layout_margin="@dimen/fab_margin"
-                android:clickable="true"
-                />
+
 
 
 
     </android.support.design.widget.CoordinatorLayout>
 
 
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/send"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        app:layout_anchor="@id/appbar"
+        app:layout_anchorGravity="bottom"
+        android:src="@drawable/ic_action_name"
+        android:layout_margin="@dimen/fab_margin"
+        android:clickable="true"
+        app:backgroundTint="#ff0000"
+        />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/pdf"

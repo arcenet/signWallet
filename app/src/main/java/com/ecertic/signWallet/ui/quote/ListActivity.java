@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.util.Base64;
@@ -14,8 +15,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.util.Log;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.ecertic.signWallet.R;
@@ -39,6 +43,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.ecertic.signWallet.ui.quote.ArticleListFragment.*;
 
@@ -56,12 +62,22 @@ public class ListActivity extends BaseActivity implements Callback {
     private static String url;
     private String lastId;
     AlertDialog  alert;
+    Spinner spinner;
+    private List<DummyContent.DummyItem> clone = new ArrayList<DummyContent.DummyItem>();
 
     @Override
     protected void onRestart(){
         super.onRestart();
-        updateList();
+        Log.e("Dummies1", DummyContent.ITEMS.toString());
+        updateList(false);
 
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        Log.e("Dummies2", DummyContent.ITEMS.toString());
+        updateList(false);
     }
 
     @Override
@@ -85,7 +101,7 @@ public class ListActivity extends BaseActivity implements Callback {
         }
 
         //Actualiza la lista de contratos
-        updateList();
+        updateList(true);
 
 
         /*Launch de aplicación a través de un código QR válido*/
@@ -179,9 +195,77 @@ public class ListActivity extends BaseActivity implements Callback {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.sample_actions, menu);
+        getMenuInflater().inflate(R.menu.list_menu, menu);
+        MenuItem item = menu.findItem(R.id.spinner);
+        spinner = (Spinner) MenuItemCompat.getActionView(item);
+        String[] items = new String[]{"Todos", "Pendientes", "Finalizados", "Error"};
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
+
+        spinner.setAdapter(adapter); // set the adapter to provide layout of rows and content
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
+                int pos = spinner.getSelectedItemPosition();
+                switch (pos){
+                    case 0: ArticleListFragment.hiddenPositions.clear();
+                            ArticleListFragment fragmentById = (ArticleListFragment) getFragmentManager().findFragmentById(R.id.article_list);
+                            fragmentById.update();
+                            break;
+                    case 1: filterPend();
+                            break;
+                    case 2: filterFin();
+                            break;
+                    case 3: filterErr();
+                            break;
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parentView) {
+                // your code here
+            }
+
+        });
         return true;
     }
 
+    private void filterPend() {
+        ArticleListFragment.hiddenPositions.clear();
+
+        for (int i = 0; i <= DummyContent.ITEMS.size()-1;i++){
+            if (!(DummyContent.ITEMS.get(i).status == DummyContent.DummyItem.PENDIENTE_DE_ENVIO)){
+                ArticleListFragment.hiddenPositions.add(i);
+            }
+        }
+        ArticleListFragment fragmentById = (ArticleListFragment) getFragmentManager().findFragmentById(R.id.article_list);
+        fragmentById.update();
+    }
+    private void filterFin()  {
+        ArticleListFragment.hiddenPositions.clear();
+
+        for (int i = 0; i <= DummyContent.ITEMS.size()-1;i++){
+            if (!(DummyContent.ITEMS.get(i).status == DummyContent.DummyItem.FINALIZADO)){
+                ArticleListFragment.hiddenPositions.add(i);
+            }
+        }
+        ArticleListFragment fragmentById = (ArticleListFragment) getFragmentManager().findFragmentById(R.id.article_list);
+        fragmentById.update();
+
+    }
+    private void filterErr()  {
+
+        ArticleListFragment.hiddenPositions.clear();
+
+        for (int i = 0; i <= DummyContent.ITEMS.size()-1;i++){
+            Log.e("Status",String.valueOf(DummyContent.ITEMS.get(i).status));
+            if (!(DummyContent.ITEMS.get(i).status == DummyContent.DummyItem.ERROR)){
+                ArticleListFragment.hiddenPositions.add(i);
+            }
+        }
+        ArticleListFragment fragmentById = (ArticleListFragment) getFragmentManager().findFragmentById(R.id.article_list);
+        fragmentById.update();
+
+    }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -190,7 +274,10 @@ public class ListActivity extends BaseActivity implements Callback {
                 return true;
         }
         return super.onOptionsItemSelected(item);
+
     }
+
+
 
     @Override
     protected int getSelfNavDrawerItem() {
@@ -204,7 +291,7 @@ public class ListActivity extends BaseActivity implements Callback {
 
 
     //Actualiza la lista de contratos: un contrato por archivo JSON en el Internal Storage
-    public void updateList(){
+    public void updateList(boolean first){
         int i= DummyContent.ITEMS.size();
         Log.d("Dummy Size ",String.valueOf(i));
         Boolean fileExists = false;
@@ -232,15 +319,24 @@ public class ListActivity extends BaseActivity implements Callback {
 
                             fileExists = true;
                             Log.d("Names: ", "File Exists");
+                            break;
+
                         }
-                        ;
+
                     }
 
                     if (!fileExists) {
 
-                        DummyContent.addItem(new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", "Empresa X", filet.getName()));
-                        loadDummyStatus(filet,DummyContent.ITEMS.get(i));
-                        i++;
+                        DummyContent.DummyItem fa = new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", "Empresa X", filet.getName());
+                        DummyContent.addItem(fa);
+
+                        if (first){
+                            loadDummyStatus(filet,fa);
+                        }
+                        else {
+                            fa.status = 0;
+                            i++;
+                        }
 
                     }
                 }
@@ -254,6 +350,7 @@ public class ListActivity extends BaseActivity implements Callback {
 
 
     }
+
 
     public void loadDummyStatus(File file, DummyContent.DummyItem dummyItem){
 
@@ -408,16 +505,19 @@ public class ListActivity extends BaseActivity implements Callback {
                     e.printStackTrace();
                 }
 
-                pDialog.dismiss();
+
             }
             else{
                 errorMessage();
-                pDialog.dismiss();
+
 
             }
 
+            if (pDialog != null && pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
 
-            updateList();
+            updateList(false);
             AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ListActivity.this);
 
             alertBuilder.setTitle("Aviso");

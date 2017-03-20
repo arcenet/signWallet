@@ -3,6 +3,7 @@ package com.ecertic.signWallet.ui.quote;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -65,6 +66,7 @@ public class ArticleDetailFragment extends BaseFragment {
 
     public JSONObject json;
     public JSONObject jsonR;
+    AlertDialog  alert;
 
     /**
      * The argument represents the dummy item ID of this fragment.
@@ -132,7 +134,7 @@ public class ArticleDetailFragment extends BaseFragment {
         //CoordinatorLayout signBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.signLayout);
 
         CoordinatorLayout sendBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.sendLayout);
-        sendBtnCL.setVisibility(View.GONE);
+        //sendBtnCL.setVisibility(View.GONE);
 
         //Código para deshabilitar/desaparecer el botón de envio
 
@@ -171,10 +173,10 @@ public class ArticleDetailFragment extends BaseFragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.action_settings:
+            /*case R.id.action_settings:
                 // your logic
                 // Aqui van las opciones del menu de arriba a la derecha...
-                return true;
+                return true;*/
         }
         return super.onOptionsItemSelected(item);
     }
@@ -215,7 +217,39 @@ public class ArticleDetailFragment extends BaseFragment {
 
     @OnClick(R.id.send)
     public void onSendClick(View view) {
-        new sendJson().execute();
+        AlertDialog.Builder alertBuilder = new AlertDialog.Builder(getActivity());
+
+        alertBuilder.setTitle("Aviso");
+        alertBuilder.setMessage("¿Estás seguro que deseas eliminar esta operación y todos sus archivos?");
+        alertBuilder.setIcon(android.R.drawable.ic_dialog_alert);
+        alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+                File dir = getActivity().getFilesDir();
+                File file = new File(dir, dummyItem.content);
+                File pdfFile = new File(dir, dummyItem.content + ".pdf");
+                boolean deleted = file.delete() && pdfFile.delete();
+                int id = Integer.parseInt(dummyItem.id);
+                DummyContent.ITEMS.remove(id);
+
+                Intent retList = new Intent(getActivity(), ListActivity.class);
+                startActivity(retList);
+
+
+
+
+            }});
+        alertBuilder.setNegativeButton(android.R.string.no, new DialogInterface.OnClickListener() {
+
+            public void onClick(DialogInterface dialog, int whichButton) {
+
+                alert.dismiss();
+            }});
+
+
+        alert = alertBuilder.create();
+        alert.show();
 
 
 

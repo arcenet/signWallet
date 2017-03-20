@@ -24,6 +24,8 @@ import com.bumptech.glide.request.target.BitmapImageViewTarget;
 import com.ecertic.signWallet.R;
 import com.ecertic.signWallet.dummy.DummyContent;
 
+import java.util.ArrayList;
+
 /**
  * Shows a list of all available quotes.
  * <p/>
@@ -32,6 +34,7 @@ import com.ecertic.signWallet.dummy.DummyContent;
 public class ArticleListFragment extends ListFragment {
 
     private Callback callback = dummyCallback;
+    public static ArrayList<Integer> hiddenPositions = new ArrayList<>();
 
     /**
      * A callback interface. Called whenever a item has been selected.
@@ -105,9 +108,11 @@ public class ArticleListFragment extends ListFragment {
 
     public class MyListAdapter extends BaseAdapter {
 
+
+
         @Override
         public int getCount() {
-            return DummyContent.ITEMS.size();
+            return DummyContent.ITEMS.size() - hiddenPositions.size();
         }
 
         @Override
@@ -122,6 +127,11 @@ public class ArticleListFragment extends ListFragment {
 
         @Override
         public View getView(int position, View convertView, ViewGroup container) {
+            for(Integer hiddenIndex : hiddenPositions) {
+                if(hiddenIndex <= position) {
+                    position = position + 1;
+                }
+            }
             if (convertView == null) {
                 convertView = LayoutInflater.from(getActivity()).inflate(R.layout.list_item_article, container, false);
             }
