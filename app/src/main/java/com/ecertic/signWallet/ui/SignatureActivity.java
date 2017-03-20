@@ -112,7 +112,7 @@ public class SignatureActivity extends BaseActivity {
         mSignaturePad.setOnSignedListener(new SignaturePad.OnSignedListener() {
             @Override
             public void onStartSigning() {
-                Toast.makeText(SignatureActivity.this, "OnStartSigning", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SignatureActivity.this, "OnStartSigning", Toast.LENGTH_SHORT).show();
                 isSigning = true;
 
             }
@@ -208,14 +208,14 @@ public class SignatureActivity extends BaseActivity {
         if (writePermission) {
             Bitmap signatureBitmap = mSignaturePad.getSignatureBitmap();
             if (addJpgSignatureToGallery(signatureBitmap)) {
-                Toast.makeText(SignatureActivity.this, "Signature saved into the Gallery", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SignatureActivity.this, "Signature saved into the Gallery", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(SignatureActivity.this, "Unable to store the signature", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SignatureActivity.this, "Unable to store the signature", Toast.LENGTH_SHORT).show();
             }
             if (addPngSignatureToGallery(signatureBitmap)) {
-                Toast.makeText(SignatureActivity.this, "Signature PNG saved into the Gallery", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SignatureActivity.this, "Signature PNG saved into the Gallery", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(SignatureActivity.this, "Unable to store the signature", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(SignatureActivity.this, "Unable to store the signature", Toast.LENGTH_SHORT).show();
             }
 
             buildJSON();

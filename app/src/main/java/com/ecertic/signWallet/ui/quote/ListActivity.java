@@ -77,7 +77,7 @@ public class ListActivity extends BaseActivity implements Callback {
     protected void onResume(){
         super.onResume();
         Log.e("Dummies2", DummyContent.ITEMS.toString());
-        updateList(false);
+        //updateList(false);
     }
 
     @Override
