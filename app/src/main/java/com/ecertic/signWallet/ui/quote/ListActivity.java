@@ -327,7 +327,7 @@ public class ListActivity extends BaseActivity implements Callback {
 
                     if (!fileExists) {
 
-                        DummyContent.DummyItem fa = new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", "Empresa X", filet.getName());
+                        DummyContent.DummyItem fa = new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", filet.getName(), filet.getName());
                         DummyContent.addItem(fa);
 
                         if (first){
