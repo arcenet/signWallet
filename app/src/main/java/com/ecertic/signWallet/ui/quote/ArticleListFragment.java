@@ -144,23 +144,23 @@ public class ArticleListFragment extends ListFragment {
             switch(item.status){
 
             case DummyContent.DummyItem.ADVERTENCIA:
-                convertView.setBackgroundColor(Color.YELLOW);
+                convertView.setBackgroundColor(Color.argb(130,255,238,0));
                 break;
 
             case DummyContent.DummyItem.ERROR:
-                convertView.setBackgroundColor(Color.RED);
+                convertView.setBackgroundColor(Color.argb(130,238,0,0));
                 break;
 
             case DummyContent.DummyItem.FINALIZADO:
-                convertView.setBackgroundColor(Color.GREEN);
+                convertView.setBackgroundColor(Color.argb(130,0,221,0));
                 break;
 
             case DummyContent.DummyItem.CADUCADO:
-                convertView.setBackgroundColor(Color.RED);
+                convertView.setBackgroundColor(Color.argb(130,238,0,0));
                 break;
 
             case DummyContent.DummyItem.PENDIENTE_DE_ENVIO:
-                convertView.setBackgroundColor(Color.YELLOW);
+                convertView.setBackgroundColor(Color.argb(130,255,238,0));
             }
 
 

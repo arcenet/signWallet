@@ -453,7 +453,7 @@ public class SignatureActivity extends BaseActivity {
     //Obtener archivo JSON desde archivo con nombre igual al id pasado en la actividad anterior
     public void getJSON() {
         String id = getIntent().getExtras().getString("oId");
-        File file = new File(getFilesDir(), id);
+        File file = new File(getFilesDir(), id + ".json");
 
         FileInputStream fis;
         String content = "";
@@ -485,21 +485,12 @@ public class SignatureActivity extends BaseActivity {
         //Guardar archivo con contenido del JSON en un archivo con nombre igual al id de operacion
         FileOutputStream outputStream;
         try {
-            File file = new File(getFilesDir(),json.optString("oId"));
 
-
-
-
-
-                outputStream = openFileOutput(json.optString("oId"), Context.MODE_PRIVATE);
+                outputStream = openFileOutput(json.optString("oId") + ".json", Context.MODE_PRIVATE);
 
                 outputStream.write(json.toString().getBytes());
                 outputStream.close();
                 Log.d("Message:", "File saved");
-
-
-
-
 
             Log.d("Directory:", json.optString("oId") + "Filelist: " + getFilesDir());
 

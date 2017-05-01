@@ -11,62 +11,91 @@
        android:layout_width="match_parent"
        android:layout_height="match_parent"
        android:orientation="horizontal"
-       android:weightSum="15">
+       android:weightSum="15"
+       android:paddingStart="10dp">
 
 
-      <TextView
+      <android.support.design.widget.CoordinatorLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="5"
+          android:layout_gravity="center_vertical"
+          >
+      <ImageView
+          android:scaleType="centerInside"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:background="@drawable/square"
           android:layout_gravity="center_vertical|left"
-          android:layout_marginEnd="5dp"
-          android:layout_marginStart="3dp"
-          android:layout_weight="1"/>
+
+
+          />
 
        <TextView
         android:id="@+id/texthere2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Finalizada"
-        android:textSize="16sp"
+        android:textSize="15sp"
         android:layout_centerVertical="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginEnd="8dp" android:layout_gravity="center_vertical|left"
-           android:layout_weight="4"/>
+        android:layout_gravity="center_vertical|center"
+        android:paddingStart="10dp"
+           />
+      </android.support.design.widget.CoordinatorLayout>
 
-      <TextView
+
+      <android.support.design.widget.CoordinatorLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="5"
+          android:layout_gravity="center_vertical"
+          >
+      <ImageView
+          android:scaleType="centerInside"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:background="@drawable/square_yellow"
-          android:layout_gravity="center_vertical|center"
-          android:layout_marginEnd="5dp"
-          android:layout_weight="1"/>
+          android:layout_gravity="center_vertical|left"
+
+          />
 
       <TextView
           android:id="@+id/texthere3"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="Advertencia"
-          android:textSize="16sp"
-          android:layout_marginEnd="8dp" android:layout_gravity="center_vertical|center"
-          android:layout_weight="4"/>
+          android:textSize="15sp"
+          android:layout_gravity="center_vertical|center"
+          android:paddingStart="10dp"
+          />
+      </android.support.design.widget.CoordinatorLayout>
 
-      <TextView
+
+      <android.support.design.widget.CoordinatorLayout
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_weight="5"
+          android:layout_gravity="center_vertical">
+
+         <ImageView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:background="@drawable/square_red"
-          android:layout_gravity="center_vertical|end"
-          android:layout_marginEnd="5dp"
-          android:layout_weight="1"/>
+          android:layout_gravity="center_vertical|left"
+
+          />
 
       <TextView
           android:id="@+id/texthere4"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="Error"
-          android:textSize="16sp"
-          android:layout_marginEnd="8dp" android:layout_gravity="center_vertical|end"
-          android:layout_weight="4"/>
+          android:textSize="15sp"
+          android:layout_gravity="center_vertical|center"
+          android:paddingStart="10dp"
+          />
+      </android.support.design.widget.CoordinatorLayout>
 
    </LinearLayout>
 

@@ -1,12 +1,16 @@
 package com.ecertic.signWallet.ui.quote;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Message;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -25,6 +29,7 @@ import android.widget.Toast;
 import com.ecertic.signWallet.R;
 import com.ecertic.signWallet.dummy.DummyContent;
 import com.ecertic.signWallet.ui.base.BaseActivity;
+import com.ecertic.signWallet.util.AlarmReceiver;
 import com.ecertic.signWallet.util.JSONParser;
 import com.ecertic.signWallet.util.LogUtil;
 
@@ -44,6 +49,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 import static com.ecertic.signWallet.ui.quote.ArticleListFragment.*;
@@ -61,9 +67,14 @@ public class ListActivity extends BaseActivity implements Callback {
     private JSONObject jsonR = new JSONObject();
     private static String url;
     private String lastId;
+    private int totalCont;
+    private int pendCont = 0;
+    private int finCont = 0;
+    private int errCont = 0;
     AlertDialog  alert;
     Spinner spinner;
     private List<DummyContent.DummyItem> clone = new ArrayList<DummyContent.DummyItem>();
+
 
     @Override
     protected void onRestart(){
@@ -104,6 +115,7 @@ public class ListActivity extends BaseActivity implements Callback {
         updateList(true);
 
 
+        countCont();
         /*Launch de aplicación a través de un código QR válido*/
 
         Bundle b = getIntent().getExtras();
@@ -132,7 +144,59 @@ public class ListActivity extends BaseActivity implements Callback {
             }
         }
 
+        setNotification();
 
+
+
+    }
+
+    private void countCont() {
+        totalCont = DummyContent.ITEMS.size();
+        for (int i= 0; i < DummyContent.ITEMS.size(); i++){
+            if (DummyContent.ITEMS.get(i).status == DummyContent.DummyItem.LISTO){
+                pendCont++;
+            }
+            if (DummyContent.ITEMS.get(i).status == DummyContent.DummyItem.ERROR){
+                errCont++;
+            }
+            if (DummyContent.ITEMS.get(i).status == DummyContent.DummyItem.FINALIZADO){
+                finCont++;
+            }
+        }
+    }
+
+    private void setNotification() {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        Intent alarmIntent = new Intent(ListActivity.this, AlarmReceiver.class); // AlarmReceiver1 = broadcast receiver
+
+        int count = 0;
+        for (int i = 0; i < DummyContent.ITEMS.size();i++) {
+            if (DummyContent.ITEMS.get(i).status == DummyContent.DummyItem.LISTO){
+                count++;
+            }
+        }
+        alarmIntent.putExtra("Pend",count);
+
+        PendingIntent pendingIntent = PendingIntent.getBroadcast( ListActivity.this, 0, alarmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        alarmIntent.setData((Uri.parse("custom://"+System.currentTimeMillis())));
+
+
+
+        Log.e("Count", String.valueOf(count));
+
+
+
+        Calendar alarmStartTime = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
+        alarmStartTime.set(Calendar.HOUR_OF_DAY, 1);
+        alarmStartTime.set(Calendar.MINUTE, 44);
+        alarmStartTime.set(Calendar.SECOND, 0);
+        if (now.after(alarmStartTime)) {
+            Log.d("Hey","Added a day");
+            alarmStartTime.add(Calendar.DATE, 1);
+        }
+
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, alarmStartTime.getTimeInMillis(), AlarmManager.INTERVAL_DAY, pendingIntent);
 
     }
 
@@ -198,7 +262,10 @@ public class ListActivity extends BaseActivity implements Callback {
         getMenuInflater().inflate(R.menu.list_menu, menu);
         MenuItem item = menu.findItem(R.id.spinner);
         spinner = (Spinner) MenuItemCompat.getActionView(item);
-        String[] items = new String[]{"Todos", "Pendientes", "Finalizados", "Error"};
+        String[] items = new String[]{"Todos " + "(" + String.valueOf(totalCont) + ")",
+                "Pendientes " + "(" + String.valueOf(pendCont) + ")",
+                "Finalizados " + "(" + String.valueOf(finCont) + ")",
+                "Error " + "(" + String.valueOf(errCont) + ")"};
         ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_dropdown_item, items);
 
         spinner.setAdapter(adapter); // set the adapter to provide layout of rows and content
@@ -233,7 +300,7 @@ public class ListActivity extends BaseActivity implements Callback {
         ArticleListFragment.hiddenPositions.clear();
 
         for (int i = 0; i <= DummyContent.ITEMS.size()-1;i++){
-            if (!(DummyContent.ITEMS.get(i).status == DummyContent.DummyItem.PENDIENTE_DE_ENVIO)){
+            if (!((DummyContent.ITEMS.get(i).status == DummyContent.DummyItem.PENDIENTE_DE_ENVIO)|| DummyContent.ITEMS.get(i).status == DummyContent.DummyItem.LISTO)){
                 ArticleListFragment.hiddenPositions.add(i);
             }
         }
@@ -307,11 +374,11 @@ public class ListActivity extends BaseActivity implements Callback {
 
                 //Vericar que para cada archivo JSON, exista un Dummy Item, si no crearlo.
 
-                if (!filet.getName().equals("instant-run") && !filet.getName().contains(".pdf")) {
+                if (filet.getName().contains(".json")) {
 
                     for (int f = 0; f <= DummyContent.ITEMS.size() - 1; f++) {
 
-                        if (filet.getName().equals(DummyContent.ITEMS.get(f).content)){
+                        if (filet.getName().equals(DummyContent.ITEMS.get(f).content + ".json")){
 
                             //Cargar al dummy item, el status guardado su archivo ccorrespondiente (cargar datos al iniciar la aplicación)
                             loadDummyStatus(filet,DummyContent.ITEMS.get(f));
@@ -327,7 +394,7 @@ public class ListActivity extends BaseActivity implements Callback {
 
                     if (!fileExists) {
 
-                        DummyContent.DummyItem fa = new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", filet.getName(), filet.getName());
+                        DummyContent.DummyItem fa = new DummyContent.DummyItem(String.valueOf(i), R.drawable.p5, "Contrato Galp", filet.getName(), filet.getName().substring(0,filet.getName().lastIndexOf('.')));
                         DummyContent.addItem(fa);
 
                         if (first){
@@ -387,6 +454,7 @@ public class ListActivity extends BaseActivity implements Callback {
 
         private ProgressDialog pDialog;
         HttpURLConnection urlConnection;
+        boolean flag = false;
 
         @Override
         protected void onPreExecute() {
@@ -431,6 +499,8 @@ public class ListActivity extends BaseActivity implements Callback {
 
                 } catch (IOException e) {
                     e.printStackTrace();
+                    flag = true;
+
                 }
 
 
@@ -443,17 +513,24 @@ public class ListActivity extends BaseActivity implements Callback {
         @Override
         protected void onPostExecute(String json) {
 
-            Boolean error = false;
-            FileOutputStream outputStream;
-            try {
-                if (json.isEmpty()) {
-                    error = true;
+            if (flag) {
+                if (pDialog != null && pDialog.isShowing()) {
+                    pDialog.dismiss();
                 }
-                else{
+                Toast.makeText(ListActivity.this, "Error de conexión a Internet ", Toast.LENGTH_SHORT).show();
+            }
 
-                    jsonR = new JSONObject(json);
-                    jsonR.put("status", DummyContent.DummyItem.LISTO);
-                    Log.d("JSON Content:", json);
+            else {
+                Boolean error = false;
+                FileOutputStream outputStream;
+                try {
+                    if (json.isEmpty()) {
+                        error = true;
+                    } else {
+
+                        jsonR = new JSONObject(json);
+                        jsonR.put("status", DummyContent.DummyItem.LISTO);
+                        Log.d("JSON Content:", json);
 
                         String pdf64 = jsonR.getJSONObject("file").getString("content");
 
@@ -464,92 +541,94 @@ public class ListActivity extends BaseActivity implements Callback {
                         fos.close();
 
 
-                }
-            } catch (JSONException | IOException e) {
-                e.printStackTrace();
-            }
-
-            //Verifica si existe un error en el contenido
-            if (!error) {
-
-                //Guardar archivo con contenido del JSON en un archivo con nombre igual al id de operacion
-                try {
-                    File file = new File(getFilesDir(), jsonR.optString("oId"));
-
-
-                    if (!file.exists()) {
-
-                        outputStream = openFileOutput(jsonR.optString("oId"), Context.MODE_PRIVATE);
-
-                        outputStream.write(jsonR.toString().getBytes());
-                        outputStream.close();
-                        Log.d("Message:", "File saved");
-                    } else {
-                        Log.d("Message:", "File alerady exists");
                     }
-
-
-                    Log.d("Directory:", jsonR.optString("oId") + "Filelist: " + getFilesDir());
-
-                    //Imprime la lista de archivos guardados en ese momento
-                    File dir = getFilesDir();
-                    File[] subFiles = dir.listFiles();
-                    if (subFiles != null) {
-                        for (File filet : subFiles) {
-                            Log.d("Files: ", filet.getName());
-                        }
-                    }
-
-
-                } catch (Exception e) {
+                } catch (JSONException | IOException e) {
                     e.printStackTrace();
                 }
 
+                //Verifica si existe un error en el contenido
+                if (!error) {
+
+                    //Guardar archivo con contenido del JSON en un archivo con nombre igual al id de operacion
+                    try {
+                        File file = new File(getFilesDir(), jsonR.optString("oId") + ".json");
+
+
+                        if (!file.exists()) {
+
+                            outputStream = openFileOutput(jsonR.optString("oId") + ".json", Context.MODE_PRIVATE);
+
+                            outputStream.write(jsonR.toString().getBytes());
+                            outputStream.close();
+                            Log.d("Message:", "File saved");
+                        } else {
+                            Log.d("Message:", "File alerady exists");
+                        }
+
+
+                        Log.d("Directory:", jsonR.optString("oId") + "Filelist: " + getFilesDir());
+
+                        //Imprime la lista de archivos guardados en ese momento
+                        File dir = getFilesDir();
+                        File[] subFiles = dir.listFiles();
+                        if (subFiles != null) {
+                            for (File filet : subFiles) {
+                                Log.d("Files: ", filet.getName());
+                            }
+                        }
+
+
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+
+
+                } else {
+                    errorMessage();
+
+
+                }
+
+                if (pDialog != null && pDialog.isShowing()) {
+                    pDialog.dismiss();
+                }
+
+                updateList(false);
+                AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ListActivity.this);
+
+                alertBuilder.setTitle("Aviso");
+                alertBuilder.setMessage("Se ha agregado una nueva operación al wallet, ¿deseas proceder con la firma del documento o verlo mas tarde?");
+                alertBuilder.setIcon(android.R.drawable.ic_dialog_alert);
+                alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                        Bundle b = new Bundle();
+                        b.putString("id", lastId);
+
+                        Log.d("IDIDIDID", lastId);
+                        Intent detailIntent = new Intent(ListActivity.this, ArticleDetailActivity.class);
+                        detailIntent.putExtra(ArticleDetailFragment.ARG_ITEM_ID, lastId);
+                        detailIntent.putExtras(b);
+                        startActivity(detailIntent);
+
+                    }
+                });
+                alertBuilder.setNegativeButton("Verlo mas tarde", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int whichButton) {
+
+                        alert.dismiss();
+                    }
+                });
+
+
+                alert = alertBuilder.create();
+                alert.show();
 
             }
-            else{
-                errorMessage();
-
-
-            }
-
-            if (pDialog != null && pDialog.isShowing()) {
-                pDialog.dismiss();
-            }
-
-            updateList(false);
-            AlertDialog.Builder alertBuilder = new AlertDialog.Builder(ListActivity.this);
-
-            alertBuilder.setTitle("Aviso");
-            alertBuilder.setMessage("Se ha agregado una nueva operación al wallet, ¿deseas proceder con la firma del documento o verlo mas tarde?");
-            alertBuilder.setIcon(android.R.drawable.ic_dialog_alert);
-            alertBuilder.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                    Bundle b = new Bundle();
-                    b.putString("id", lastId);
-
-                    Log.d("IDIDIDID",lastId );
-                    Intent detailIntent = new Intent(ListActivity.this, ArticleDetailActivity.class);
-                    detailIntent.putExtra(ArticleDetailFragment.ARG_ITEM_ID, lastId);
-                    detailIntent.putExtras(b);
-                    startActivity(detailIntent);
-
-                }});
-            alertBuilder.setNegativeButton("Verlo mas tarde", new DialogInterface.OnClickListener() {
-
-                public void onClick(DialogInterface dialog, int whichButton) {
-
-                    alert.dismiss();
-                }});
-
-
-            alert = alertBuilder.create();
-            alert.show();
 
         }
-
     }
 }
 

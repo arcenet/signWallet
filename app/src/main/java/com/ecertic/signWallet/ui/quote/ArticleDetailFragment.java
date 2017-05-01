@@ -93,6 +93,9 @@ public class ArticleDetailFragment extends BaseFragment {
     @Bind(R.id.collapsing_toolbar)
     CollapsingToolbarLayout collapsingToolbar;
 
+    @Bind(R.id.detalle)
+    TextView detalle;
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -129,6 +132,18 @@ public class ArticleDetailFragment extends BaseFragment {
             collapsingToolbar.setTitle(dummyItem.title);
             author.setText(dummyItem.author);
             quote.setText(dummyItem.content);
+            try {
+                String dName = (json.getJSONArray("signers").getJSONObject(0).getJSONObject("profile").getString("name"));
+                String dDNI = json.getJSONArray("signers").getJSONObject(0).getJSONObject("profile").getString("dni");
+                String dEmail = json.getJSONArray("signers").getJSONObject(0).getJSONObject("profile").getString("email");
+                String dFname = json.getJSONObject("file").getString("name");
+                detalle.setText("Nombre del Firmante: " + dName +
+                                "\nCorreo: " + dEmail +
+                                "\nDNI: " + dDNI +
+                                "\nNombre del Documento: " + dFname);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
 
         //CoordinatorLayout signBtnCL = (CoordinatorLayout) rootView.findViewById(R.id.signLayout);
@@ -227,7 +242,7 @@ public class ArticleDetailFragment extends BaseFragment {
             public void onClick(DialogInterface dialog, int whichButton) {
 
                 File dir = getActivity().getFilesDir();
-                File file = new File(dir, dummyItem.content);
+                File file = new File(dir, dummyItem.content + ".json");
                 File pdfFile = new File(dir, dummyItem.content + ".pdf");
                 boolean deleted = file.delete() && pdfFile.delete();
                 int id = Integer.parseInt(dummyItem.id);
@@ -320,12 +335,12 @@ public class ArticleDetailFragment extends BaseFragment {
         try {
             FileOutputStream outputStream;
 
-            File file = new File(getActivity().getFilesDir(), json.optString("oId"));
+            File file = new File(getActivity().getFilesDir(), json.optString("oId") + ".json");
 
 
 
 
-                outputStream = getActivity().openFileOutput(json.optString("oId"), Context.MODE_PRIVATE);
+                outputStream = getActivity().openFileOutput(json.optString("oId") + ".json", Context.MODE_PRIVATE);
 
                 outputStream.write(json.toString().getBytes());
                 outputStream.close();
@@ -370,7 +385,7 @@ public class ArticleDetailFragment extends BaseFragment {
             return;
         }
         String id = dummyItem.content;
-        File file = new File(getActivity().getFilesDir(), id);
+        File file = new File(getActivity().getFilesDir(), id + ".json");
 
         FileInputStream fis;
         String content = "";
@@ -405,6 +420,7 @@ public class ArticleDetailFragment extends BaseFragment {
         private ProgressDialog pDialog;
 
         HttpURLConnection urlConnection;
+        boolean flag = false;
 
         @Override
         protected void onPreExecute() {
@@ -422,13 +438,7 @@ public class ArticleDetailFragment extends BaseFragment {
 
             StringBuilder result = new StringBuilder();
 
-            /* Getting JSON from URL
-            JSONObject json = null;
-            try {
-                json = jParser.getJSONFromUrl(url);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }*/
+
             try {
                 URL postURL = new URL("https://testapi.rubricae.es/sendSign/sign");
                 urlConnection = (HttpURLConnection) postURL.openConnection();
@@ -493,6 +503,8 @@ public class ArticleDetailFragment extends BaseFragment {
 
             }catch( Exception e) {
                 e.printStackTrace();
+                flag = true;
+
             }
             finally {
 
@@ -507,11 +519,19 @@ public class ArticleDetailFragment extends BaseFragment {
         @Override
         protected void onPostExecute(String json) {
 
+            if (flag) {
+                if (pDialog != null && pDialog.isShowing()) {
+                    pDialog.dismiss();
+                }
+                Toast.makeText(getActivity(), "Error de conexión a Internet ", Toast.LENGTH_SHORT).show();
+            }
             //Toast.makeText(getActivity(), "Firmado", Toast.LENGTH_SHORT).show();
 
             //Actualizar estado de la operación
-            
-            pDialog.dismiss();
+
+            if (pDialog != null && pDialog.isShowing()) {
+                pDialog.dismiss();
+            }
         }
 
     }
